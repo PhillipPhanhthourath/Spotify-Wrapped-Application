@@ -8,9 +8,9 @@ An application that allow users to access Spotify Wrapped content year-round.
   
 - When creating PRs, please give a description of what you did in the following template:
 
-<br> Name(s):
-<br> Role(s):
-<br> Work Description:
-<br> Potential Problems:
-<br> Suggestions/Improvement:
+     <br> Name(s):
+     <br> Role(s):
+     <br> Work Description:
+     <br> Potential Problems:
+     <br> Suggestions/Improvement:
 
