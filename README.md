@@ -1,6 +1,8 @@
 # Spotify-Wrapped-Application
 
 An application that allow users to access Spotify Wrapped content year-round.
+[Trello Workboard] (https://trello.com/b/eIMEljoQ/2340)
+
 
 ## Rules for Branches & Pull Requests:
 - All branches will refer to individual user cases / tasks assigned on Trello.
@@ -22,6 +24,6 @@ Suggestions/Improvement:
 ```
 Title:
 Description of Assignment:
-Link to Trello Card: *developer should document process there*
+Link to Trello Card: (developer should document process there)
 Expected Deadline: 
 ```
