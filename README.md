@@ -1,7 +1,7 @@
 # Spotify-Wrapped-Application
 
-An application that allow users to access Spotify Wrapped content year-round.
-[Trello Workboard] (https://trello.com/b/eIMEljoQ/2340)
+An application that allow users to access Spotify Wrapped content year-round.  
+[Trello Workboard](https://trello.com/b/eIMEljoQ/2340)
 
 
 ## Rules for Branches & Pull Requests:
