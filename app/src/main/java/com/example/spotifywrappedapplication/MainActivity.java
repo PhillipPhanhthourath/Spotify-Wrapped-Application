@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private String mAccessToken, mAccessCode;
     private Call mCall;
 
-    private TextView tokenTextView, codeTextView, profileTextView;
+    // private TextView tokenTextView, codeTextView, profileTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
         // Initialize the buttons
         Button loginBtn = (Button) findViewById(R.id.spotify_login_btn);
         Button generateSummaryBtn = (Button) findViewById(R.id.generate_summary_btn);
+        Button codeBtn = (Button) findViewById(R.id.code_btn);
 
         // Set the click listeners for the buttons
 
@@ -59,12 +60,11 @@ public class MainActivity extends AppCompatActivity {
             getToken();
         });
 
-        /* getCode();
 
         codeBtn.setOnClickListener((v) -> {
             getCode();
         });
-        */
+
 
         generateSummaryBtn.setOnClickListener((v) -> {
             onGetUserProfileClicked();
@@ -107,11 +107,11 @@ public class MainActivity extends AppCompatActivity {
         // Check which request code is present (if any)
         if (AUTH_TOKEN_REQUEST_CODE == requestCode) {
             mAccessToken = response.getAccessToken();
-            setTextAsync("Token: " + mAccessToken, tokenTextView);
+            // setTextAsync("Token: " + mAccessToken, tokenTextView);
 
         } else if (AUTH_CODE_REQUEST_CODE == requestCode) {
             mAccessCode = response.getCode();
-            setTextAsync("Code: " + mAccessCode, codeTextView);
+            // setTextAsync("Code: " + mAccessCode, codeTextView);
         }
     }
 
@@ -146,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(Call call, Response response) throws IOException {
                 try {
                     final JSONObject jsonObject = new JSONObject(response.body().string());
-                    setTextAsync(jsonObject.toString(3), profileTextView);
+                    // setTextAsync(jsonObject.toString(3), profileTextView);
                     System.out.println(jsonObject.toString(3));
                 } catch (JSONException e) {
                     Log.d("JSON", "Failed to parse data: " + e);

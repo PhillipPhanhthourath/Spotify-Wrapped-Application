@@ -3,4 +3,5 @@
     <string name="log_in_to_spotify">Log In To Spotify</string>
     <string name="generate_summary">Generate Summary</string>
     <string name="spotify_wrapped">Spotify Wrapped</string>
+    <string name="request_code">Request Code</string>
 </resources>
