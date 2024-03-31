@@ -30,3 +30,4 @@ Description of Assignment:
 Link to Trello Card: (developer should document process there)
 Expected Deadline: 
 ```
+
