@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Background shape: Light purple -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#E1BEE7" /> <!-- Light purple color -->
+        </shape>
+    </item>
+    <!-- Lightning bolt shape: Hot pink -->
+    <item
+        android:left="16dp"
+        android:top="16dp"
+        android:right="16dp"
+        android:bottom="16dp">
+        <rotate
+            android:fromDegrees="45"
+            android:toDegrees="45"
+            android:pivotX="-25%"
+            android:pivotY="25%">
+            <shape android:shape="rectangle">
+                <size
+                    android:width="100dp"
+                    android:height="4dp" />
+                <solid android:color="#FF4081" /> <!-- Hot pink color -->
+                <corners android:radius="2dp" />
+            </shape>
+        </rotate>
+    </item>
+
+</layer-list>

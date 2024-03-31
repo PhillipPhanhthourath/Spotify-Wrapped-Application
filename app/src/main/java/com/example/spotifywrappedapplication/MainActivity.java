@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private String mAccessToken, mAccessCode;
     private Call mCall;
 
+    private TextView profileTextView;
     // private TextView tokenTextView, codeTextView, profileTextView;
 
     @Override
@@ -46,8 +47,9 @@ public class MainActivity extends AppCompatActivity {
         /* Initialize the views
         tokenTextView = (TextView) findViewById(R.id.token_text_view);
         codeTextView = (TextView) findViewById(R.id.code_text_view);
-        profileTextView = (TextView) findViewById(R.id.response_text_view);
         */
+        profileTextView = (TextView) findViewById(R.id.response_text_view);
+
 
         // Initialize the buttons
         Button loginBtn = (Button) findViewById(R.id.spotify_login_btn);
@@ -146,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(Call call, Response response) throws IOException {
                 try {
                     final JSONObject jsonObject = new JSONObject(response.body().string());
-                    // setTextAsync(jsonObject.toString(3), profileTextView);
+                    setTextAsync(jsonObject.toString(3), profileTextView);
                     System.out.println(jsonObject.toString(3));
                 } catch (JSONException e) {
                     Log.d("JSON", "Failed to parse data: " + e);

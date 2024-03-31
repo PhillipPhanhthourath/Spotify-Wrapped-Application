@@ -1,13 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#BFA8E8"
+    android:background="@drawable/background_lightning_bolt"
     tools:context=".MainActivity">
 
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TextView
+            android:id="@+id/spotify_wrapped_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/sen_bold"
+            android:text="@string/spotify_wrapped"
+            android:textColor="#FDFDFD"
+            android:textSize="45sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/spotify_login_btn"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <android.widget.Button
+            android:id="@+id/spotify_login_btn"
+            android:layout_width="257dp"
+            android:layout_height="108dp"
+            android:layout_margin="8dp"
+            android:background="@drawable/rounded_button"
+            android:fontFamily="@font/sen_bold"
+            android:padding="30dp"
+            android:text="@string/log_in_to_spotify"
+            android:textColor="#FAFAFA"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/generate_summary_btn"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+        <Button
+            android:id="@+id/code_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/spotify_login_btn"
+            app:layout_constraintBottom_toTopOf="@id/generate_summary_btn"
+            android:text="@string/request_code" />
+
+        <TextView
+            android:id="@+id/response_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/code_btn"
+            app:layout_constraintBottom_toTopOf="@id/generate_summary_btn"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:textSize="10sp"
+            tools:text="Line 1\nLine 2\nLine 3" />
+
+        <android.widget.Button
+            android:id="@+id/generate_summary_btn"
+            android:layout_width="238dp"
+            android:layout_height="119dp"
+            android:layout_margin="8dp"
+            android:background="@drawable/rounded_button"
+            android:backgroundTint="#FF9800"
+            android:fontFamily="@font/sen_bold"
+            android:padding="30dp"
+            android:text="@string/generate_summary"
+            android:textColor="#FAFAFA"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.496"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/spotify_login_btn"
+            app:layout_constraintVertical_bias="1.0" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!--
     <TextView
         android:id="@+id/spotify_wrapped_text_view"
         android:layout_width="wrap_content"
@@ -71,7 +150,18 @@
         app:layout_constraintBottom_toTopOf="@id/generate_summary_btn"
         android:text="@string/request_code" />
 
-    <!--LinearLayout
+    <TextView
+        android:id="@+id/response_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/code_btn"
+        app:layout_constraintBottom_toTopOf="@id/generate_summary_btn"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:textSize="10sp"
+        tools:text="Line 1\nLine 2\nLine 3" />
+
+    <!-LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#BFA8E8"
@@ -127,4 +217,4 @@
         </LinearLayout-->
     <!--/LinearLayout-->
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>
