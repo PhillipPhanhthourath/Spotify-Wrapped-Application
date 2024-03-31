@@ -61,14 +61,14 @@
             app:layout_constraintTop_toBottomOf="@id/code_btn"
             app:layout_constraintBottom_toTopOf="@id/generate_summary_btn"
             app:layout_constraintEnd_toEndOf="parent"
-            android:textSize="10sp"
-            tools:text="Line 1\nLine 2\nLine 3" />
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            tools:text="Response Text View" />
 
         <android.widget.Button
             android:id="@+id/generate_summary_btn"
-            android:layout_width="238dp"
-            android:layout_height="119dp"
-            android:layout_margin="8dp"
+            android:layout_width="257dp"
+            android:layout_height="108dp"
             android:background="@drawable/rounded_button"
             android:backgroundTint="#FF9800"
             android:fontFamily="@font/sen_bold"
@@ -79,10 +79,8 @@
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.496"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/spotify_login_btn"
-            app:layout_constraintVertical_bias="1.0" />
+            app:layout_constraintTop_toBottomOf="@+id/spotify_login_btn" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
