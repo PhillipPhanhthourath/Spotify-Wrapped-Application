@@ -22,7 +22,7 @@ Suggestions/Improvement:
 
 ## Rules for Issues: 
 - All issues will be created and assigned by the scrum master (Phil).
-- They will follow the tasks assigned on Trello.
+- They will follow the tasks assigned on Trello.gi
 - They will be created using the following template:
 ```
 Title:
