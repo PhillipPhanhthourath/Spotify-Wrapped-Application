@@ -12,24 +12,25 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SpotifyWrappedApplication"
         tools:targetApi="31">
-        ...
         <activity
             android:name=".MainActivity"
             android:exported="true">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-
-            <intent-filter>
-<!--                // Match the scheme and host of the redirect URI-->
-<!--                // Must be the same in MainAcitivity, Gradle, and Spotify Dashboard!-->
                 <data android:host="auth" android:scheme="spotifywrappedapplication"/>
             </intent-filter>
-
+            <!--<intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <! Adjust these to match your Redirect URI
+                <data android:host="auth" android:scheme="spotifywrappedapplication"/>
+            </intent-filter> -->
         </activity>
-        ...
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
     </application>
 
 </manifest>
