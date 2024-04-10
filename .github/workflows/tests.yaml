@@ -1,0 +1,37 @@
+name: Unit Tests
+
+on:
+  push:
+    paths:
+      - 'app/src/**'
+  pull_request:
+    paths:
+      - 'app/src/**'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+
+      - name: Cache Maven packages
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-m2
+
+      - name: Run unit tests
+        run: mvn test --file pom.xml
+
+# NOTE: This is currently the only unit test workflow. In the future, we plan to add more test suites.
+# This workflow can be triggered from the main CI/CD pipeline file using GitHub Actions' workflow_call event if needed.
