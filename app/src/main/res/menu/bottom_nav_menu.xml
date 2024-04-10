@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/navigation_user_profile"
+        android:icon="@drawable/ic_user_profile"
+        android:title="@string/title_user_profile" />
+    <item
+        android:id="@+id/navigation_game"
+        android:icon="@drawable/ic_game"
+        android:title="@string/title_game" />
+</menu>
