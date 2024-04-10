@@ -7,13 +7,40 @@
     tools:context=".UserProfileActivity">
 
     <TextView
-        android:id="@+id/user_info_text_view"
+        android:id="@+id/text_view_result"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="User Information will be displayed here"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/button_get_profile"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Get User Profile"
+        app:layout_constraintTop_toBottomOf="@id/text_view_result"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <Button
+        android:id="@+id/button_get_playlists"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Get User Playlists"
+        app:layout_constraintTop_toBottomOf="@id/button_get_profile"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <Button
+        android:id="@+id/button_current_track"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Get Currently Playing Track"
+        app:layout_constraintTop_toBottomOf="@id/button_get_playlists"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
 
     <!-- Add this at the bottom of your activity_user_profile.xml -->
     <com.google.android.material.bottomnavigation.BottomNavigationView

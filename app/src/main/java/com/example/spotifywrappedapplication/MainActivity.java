@@ -148,6 +148,7 @@ public class MainActivity extends AppCompatActivity {
                     runOnUiThread(() -> {
                         Intent intent = new Intent(MainActivity.this, UserProfileActivity.class);
                         intent.putExtra("USER_INFO", responseData);
+                        intent.putExtra("ACCESS_TOKEN", mAccessToken);
                         startActivity(intent);
                     });
                 } else {
