@@ -50,7 +50,6 @@ public class MainActivity extends AppCompatActivity {
         */
         profileTextView = (TextView) findViewById(R.id.response_text_view);
 
-
         // Initialize the buttons
         Button loginBtn = (Button) findViewById(R.id.spotify_login_btn);
         Button generateSummaryBtn = (Button) findViewById(R.id.generate_summary_btn);
@@ -62,11 +61,9 @@ public class MainActivity extends AppCompatActivity {
             getToken();
         });
 
-
         codeBtn.setOnClickListener((v) -> {
             getCode();
         });
-
 
         generateSummaryBtn.setOnClickListener((v) -> {
             onGetUserProfileClicked();
@@ -123,11 +120,10 @@ public class MainActivity extends AppCompatActivity {
      */
     public void onGetUserProfileClicked() {
         if (mAccessToken == null) {
-            Toast.makeText(this, "You need to get an access token first!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "You need to Login to Spotify first!", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Create a request to get the user profile
         final Request request = new Request.Builder()
                 .url("https://api.spotify.com/v1/me")
                 .addHeader("Authorization", "Bearer " + mAccessToken)
@@ -139,25 +135,30 @@ public class MainActivity extends AppCompatActivity {
         mCall.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Log.d("HTTP", "Failed to fetch data: " + e);
-                Toast.makeText(MainActivity.this, "Failed to fetch data, watch Logcat for more details",
-                        Toast.LENGTH_SHORT).show();
+                // Log the error or show an error message to the user
+                Log.e("HTTP", "Failed to fetch data: " + e);
+                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Failed to fetch data: " + e.getMessage(), Toast.LENGTH_LONG).show());
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                try {
-                    final JSONObject jsonObject = new JSONObject(response.body().string());
-                    setTextAsync(jsonObject.toString(3), profileTextView);
-                    System.out.println(jsonObject.toString(3));
-                } catch (JSONException e) {
-                    Log.d("JSON", "Failed to parse data: " + e);
-                    Toast.makeText(MainActivity.this, "Failed to parse data, watch Logcat for more details",
-                            Toast.LENGTH_SHORT).show();
+                if (response.isSuccessful() && response.body() != null) {
+                    final String responseData = response.body().string();
+                    // Switch to the UI thread to start the new activity
+                    runOnUiThread(() -> {
+                        Intent intent = new Intent(MainActivity.this, UserProfileActivity.class);
+                        intent.putExtra("USER_INFO", responseData);
+                        startActivity(intent);
+                    });
+                } else {
+                    // Handle the case where the response is not successful
+                    Log.e("HTTP", "Server responded with: " + response.code());
+                    runOnUiThread(() -> Toast.makeText(MainActivity.this, "Failed to fetch user data: " + response.code(), Toast.LENGTH_LONG).show());
                 }
             }
         });
     }
+
 
     /**
      * Creates a UI thread to update a TextView in the background
