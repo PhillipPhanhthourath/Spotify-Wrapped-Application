@@ -1,0 +1,42 @@
+name: Java Linting
+
+on:
+  push:
+    paths:
+      - '**/*.java'
+      - 'pom.xml'
+  pull_request:
+    paths:
+      - '**/*.java'
+      - 'pom.xml'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+
+      - name: Cache Maven
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-m2
+
+      - name: Run linting
+        run: mvn checkstyle:checkstyle
+
+      - name: Upload Checkstyle results
+        uses: actions/upload-artifact@v2
+        if: failure() # Only upload if there is a failure
+        with:
+          name: checkstyle-results
+          path: target/checkstyle-result.xml
