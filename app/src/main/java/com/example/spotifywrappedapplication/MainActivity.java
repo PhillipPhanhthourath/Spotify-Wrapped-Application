@@ -123,41 +123,9 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "You need to Login to Spotify first!", Toast.LENGTH_SHORT).show();
             return;
         }
-
-        final Request request = new Request.Builder()
-                .url("https://api.spotify.com/v1/me")
-                .addHeader("Authorization", "Bearer " + mAccessToken)
-                .build();
-
-        cancelCall();
-        mCall = mOkHttpClient.newCall(request);
-
-        mCall.enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                // Log the error or show an error message to the user
-                Log.e("HTTP", "Failed to fetch data: " + e);
-                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Failed to fetch data: " + e.getMessage(), Toast.LENGTH_LONG).show());
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful() && response.body() != null) {
-                    final String responseData = response.body().string();
-                    // Switch to the UI thread to start the new activity
-                    runOnUiThread(() -> {
-                        Intent intent = new Intent(MainActivity.this, UserProfileActivity.class);
-                        intent.putExtra("USER_INFO", responseData);
-                        intent.putExtra("ACCESS_TOKEN", mAccessToken);
-                        startActivity(intent);
-                    });
-                } else {
-                    // Handle the case where the response is not successful
-                    Log.e("HTTP", "Server responded with: " + response.code());
-                    runOnUiThread(() -> Toast.makeText(MainActivity.this, "Failed to fetch user data: " + response.code(), Toast.LENGTH_LONG).show());
-                }
-            }
-        });
+        Intent intent = new Intent(MainActivity.this, UserProfileActivity.class);
+        intent.putExtra("ACCESS_TOKEN", mAccessToken);
+        startActivity(intent);
     }
 
 

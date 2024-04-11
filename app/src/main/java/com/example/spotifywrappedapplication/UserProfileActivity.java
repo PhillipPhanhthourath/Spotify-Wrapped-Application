@@ -46,6 +46,7 @@ public class UserProfileActivity extends AppCompatActivity {
             if (item.getItemId() == R.id.navigation_game) {
                 // Navigate to GameActivity
                 intent = new Intent(UserProfileActivity.this, GameActivity.class);
+                intent.putExtra("ACCESS_TOKEN", mAccessToken);
                 intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
                 return true;
