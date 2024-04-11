@@ -1,14 +1,30 @@
 package com.example.spotifywrappedapplication;
+import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.ValueEventListener;
 import com.spotify.sdk.android.auth.AuthorizationClient;
 import com.spotify.sdk.android.auth.AuthorizationRequest;
 import com.spotify.sdk.android.auth.AuthorizationResponse;
@@ -25,12 +41,16 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     public static final String CLIENT_ID = "895a2c54c32f4d9f98521f688d964af9";
     public static final String REDIRECT_URI = "spotifywrappedapplication://auth";
 
     public static final int AUTH_TOKEN_REQUEST_CODE = 0;
     public static final int AUTH_CODE_REQUEST_CODE = 1;
+
+    // Initialize FirebaseAuth
+    FirebaseAuth auth;
 
     private final OkHttpClient mOkHttpClient = new OkHttpClient();
     private String mAccessToken, mAccessCode;
@@ -78,8 +98,120 @@ public class MainActivity extends AppCompatActivity {
      * https://developer.spotify.com/documentation/general/guides/authorization-guide/
      */
     public void getToken() {
-        final AuthorizationRequest request = getAuthenticationRequest(AuthorizationResponse.Type.TOKEN);
-        AuthorizationClient.openLoginActivity(MainActivity.this, AUTH_TOKEN_REQUEST_CODE, request);
+
+        FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        firebaseAnalytics.logEvent("your_custom_event_name", null);
+
+        showAuthDialog(this);
+
+
+    }
+
+    public void showAuthDialog(Context context) {
+        // Create a linear layout for the dialog
+        LinearLayout layout = new LinearLayout(context);
+        layout.setOrientation(LinearLayout.VERTICAL);
+
+        // Add an EditText for the email
+        final EditText emailInput = new EditText(context);
+        emailInput.setHint("Email");
+        layout.addView(emailInput);
+
+        // Add an EditText for the password
+        final EditText passwordInput = new EditText(context);
+        passwordInput.setHint("Password");
+        layout.addView(passwordInput);
+
+        auth=FirebaseAuth.getInstance();
+
+        // Create the AlertDialog
+        new AlertDialog.Builder(context)
+                //12312322
+                .setTitle("Sign In / Register")
+                .setView(layout)
+                .setPositiveButton("Sign In", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String email = emailInput.getText().toString();
+                        String password = passwordInput.getText().toString();
+                        signInUser(email, password, auth, context);
+                    }
+                })
+                .setNegativeButton("Register", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String email = emailInput.getText().toString();
+                        String password = passwordInput.getText().toString();
+                        registerUser(email, password, auth, context);
+                    }
+                })
+                .show();
+    }
+
+    // home screen (when button pressed)-> dialog (once signed in)-> grab from database
+
+    private void signInUser(String email, String password, FirebaseAuth auth, Context context) {
+        auth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        // Assuming this is inside a method and 'context' is available
+                        Toast.makeText(context, "Signed in successfully", Toast.LENGTH_SHORT).show();
+                        FirebaseUser user = auth.getCurrentUser();
+
+// Variable to store the fetched access token
+                        final String[] fetchedAccessToken = {null};
+
+                        if (user != null) {
+                            // Get a reference to the Firebase Realtime Database
+                            FirebaseDatabase database = FirebaseDatabase.getInstance();
+                            DatabaseReference ref = database.getReference("users").child(user.getUid()).child("accessToken");
+
+                            // Read the access token from the database
+                            ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    if (dataSnapshot.exists()) {
+                                        // Get the access token from the database and store it in the local variable
+                                        fetchedAccessToken[0] = dataSnapshot.getValue(String.class);
+                                        Log.d("Firebase", "Access token fetched: " + fetchedAccessToken[0]);
+                                        mAccessToken=fetchedAccessToken[0];
+
+                                        // Here you can now use fetchedAccessToken as needed
+                                    } else {
+                                        Log.d("Firebase", "Access token not found in the database.");
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+                                    Log.e("Firebase", "Failed to read access token", databaseError.toException());
+                                }
+                            });
+                        } else {
+                            Log.e("Firebase", "No authenticated user found.");
+                        }
+                    } else {
+                        Toast.makeText(context, "Sign in failed", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    // home screen (when button pressed)-> dialog (once registered)-> open external spotify (once HTTP response received)-> add to database
+
+    private void registerUser(String email, String password, FirebaseAuth auth, Context context) {
+        auth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(context, "Registered successfully", Toast.LENGTH_SHORT).show();
+                        final AuthorizationRequest request = getAuthenticationRequest(AuthorizationResponse.Type.TOKEN);
+                        AuthorizationClient.openLoginActivity(MainActivity.this, AUTH_TOKEN_REQUEST_CODE, request);
+
+                    } else {
+                        // Get and display the error message
+                        String errorMessage = task.getException().getMessage();
+                        Toast.makeText(context, "Registration failed: " + errorMessage, Toast.LENGTH_LONG).show();
+                    }
+                });
     }
 
     /**
@@ -88,15 +220,18 @@ public class MainActivity extends AppCompatActivity {
      * What is code?
      * https://developer.spotify.com/documentation/general/guides/authorization-guide/
      */
+    @SuppressLint("RestrictedApi")
     public void getCode() {
-        final AuthorizationRequest request = getAuthenticationRequest(AuthorizationResponse.Type.CODE);
-        AuthorizationClient.openLoginActivity(MainActivity.this, AUTH_CODE_REQUEST_CODE, request);
+
+        // Registration succeeded, get the user info
     }
 
 
     /**
      * When the app leaves this activity to momentarily get a token/code, this function
      * fetches the result of that external activity to get the response from Spotify
+     *
+     * In our case - this block of code will run once a response is recieved from the spotify API
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -107,6 +242,29 @@ public class MainActivity extends AppCompatActivity {
         if (AUTH_TOKEN_REQUEST_CODE == requestCode) {
             mAccessToken = response.getAccessToken();
             // setTextAsync("Token: " + mAccessToken, tokenTextView);
+            // We retrieve the default database and place the access token in it for this user
+            // Assuming auth is already initialized as FirebaseAuth instance
+            FirebaseUser user = auth.getCurrentUser();
+            if (user != null) {
+                System.out.println("user exists");
+                // Get a reference to the Firebase Realtime Database
+                FirebaseDatabase database = FirebaseDatabase.getInstance();
+                DatabaseReference userRef = database.getReference("users").child(user.getUid());
+
+                // Store the access token in the database under this user's node
+                userRef.child("accessToken").setValue(mAccessToken)
+                        .addOnSuccessListener(aVoid -> {
+                            // Data save was successful!
+                            Log.d("Firebase", "AccessToken saved successfully.");
+                        })
+                        .addOnFailureListener(e -> {
+                            // Failed to save the data
+                            Log.e("Firebase", "Failed to save accessToken", e);
+                        });
+            } else {
+                // Handle the case where there is no authenticated user
+                Log.e("Firebase", "No authenticated user found.");
+            }
 
         } else if (AUTH_CODE_REQUEST_CODE == requestCode) {
             mAccessCode = response.getCode();
