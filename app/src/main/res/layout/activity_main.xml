@@ -49,6 +49,7 @@
             app:layout_constraintTop_toBottomOf="@id/spotify_wrapped_text_view" />
 
         <Button
+            android:visibility="invisible"
             android:id="@+id/code_btn"
             android:layout_width="206dp"
             android:layout_height="47dp"

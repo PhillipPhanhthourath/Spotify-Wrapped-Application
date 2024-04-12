@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "You need to Login to Spotify first!", Toast.LENGTH_SHORT).show();
             return;
         }
-        Intent intent = new Intent(MainActivity.this, UserProfileActivity.class);
+        Intent intent = new Intent(MainActivity.this, WelcomeScreenActivity.class);
         intent.putExtra("ACCESS_TOKEN", mAccessToken);
         startActivity(intent);
     }

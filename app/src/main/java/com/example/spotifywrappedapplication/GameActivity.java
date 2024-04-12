@@ -67,7 +67,7 @@ public class GameActivity extends AppCompatActivity {
                 Intent intent;
                 if (item.getItemId() == R.id.navigation_user_profile) {
                     // Navigate to UserProfileActivity
-                    intent = new Intent(GameActivity.this, UserProfileActivity.class);
+                    intent = new Intent(GameActivity.this, MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     startActivity(intent);
                     return true;

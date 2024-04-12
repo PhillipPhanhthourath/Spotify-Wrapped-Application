@@ -8,4 +8,9 @@
     <string name="title_user_profile">Profile</string>
     <string name="title_game">Game</string>
     <string name="game_in_development">Game in development</string>
+    <string name="cont">Continue</string>
+    <string name="welcome">Welcome\nto\nYour Wrapped</string>
+    <string name="back">Back</string>
+    <string name="game">Game</string>
+    <string name="part_one_text">Your Top 10 Playlists</string>
 </resources>
