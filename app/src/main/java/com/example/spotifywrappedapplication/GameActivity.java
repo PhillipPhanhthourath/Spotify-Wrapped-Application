@@ -60,6 +60,13 @@ public class GameActivity extends AppCompatActivity {
         System.out.println(mAccessToken);
         SpotifyApiHelper apiHelper = new SpotifyApiHelper(mAccessToken);
 
+        // User can select from several different types of games
+
+        // The only game that will be implemented in this round is the word search game
+
+        // The word search window will be have saved games, game 1, game 2, etc
+
+        // If user wants to make new word search game, they can select from their playlist and a new game will come up
         apiHelper.getTracksFromAllPlaylists(new PlaylistCallbackHandler());
 
         bottomNavigationView.setSelectedItemId(R.id.navigation_game);

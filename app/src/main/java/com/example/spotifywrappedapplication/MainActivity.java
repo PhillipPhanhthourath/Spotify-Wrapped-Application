@@ -49,9 +49,6 @@ public class MainActivity extends AppCompatActivity {
     public static final int AUTH_TOKEN_REQUEST_CODE = 0;
     public static final int AUTH_CODE_REQUEST_CODE = 1;
 
-    // Initialize FirebaseAuth
-    FirebaseAuth auth;
-
     private final OkHttpClient mOkHttpClient = new OkHttpClient();
     private String mAccessToken, mAccessCode;
     private Call mCall;
@@ -78,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
         // Set the click listeners for the buttons
 
         loginBtn.setOnClickListener((v) -> {
-            getToken();
+            handleSignIn();
         });
 
         codeBtn.setOnClickListener((v) -> {
@@ -92,153 +89,97 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Get token from Spotify
-     * This method will open the Spotify login activity and get the token
-     * What is token?
-     * https://developer.spotify.com/documentation/general/guides/authorization-guide/
+     * Performs the appropriate actions for log in user, and register user
+     * Log in user: populate the Authenticator auth with user credentials
+     * - will retrieve spotify access token saved in users account, check if valid, prompt spotify login if it isn't
+     * Register user: populate the Authenticator auth with user credentials
+     * - prompt spotify login
      */
-    public void getToken() {
+    public void handleSignIn() {
 
         FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance(this);
         firebaseAnalytics.logEvent("your_custom_event_name", null);
 
-        showAuthDialog(this);
+        //showAuthDialog(this);
+        FirebaseAuth auth= FirebaseUtils.getInstance().getFirebaseAuth();
+        DialogUtils.showSignInDialog(this, new DialogUtils.AuthDialogListener(){
+            @Override
+            public void onSignIn(String email, String password, Context context) {
+                auth.signInWithEmailAndPassword(email, password)
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(context, "Signed in successfully", Toast.LENGTH_SHORT).show();
+                                FirebaseUser user = auth.getCurrentUser();
 
-
-    }
-
-    public void showAuthDialog(Context context) {
-        // Create a linear layout for the dialog
-        LinearLayout layout = new LinearLayout(context);
-        layout.setOrientation(LinearLayout.VERTICAL);
-
-        // Add an EditText for the email
-        final EditText emailInput = new EditText(context);
-        emailInput.setHint("Email");
-        layout.addView(emailInput);
-
-        // Add an EditText for the password
-        final EditText passwordInput = new EditText(context);
-        passwordInput.setHint("Password");
-        layout.addView(passwordInput);
-
-        auth=FirebaseAuth.getInstance();
-
-        // Create the AlertDialog
-        new AlertDialog.Builder(context)
-                //12312322
-                .setTitle("Sign In / Register")
-                .setView(layout)
-                .setPositiveButton("Sign In", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String email = emailInput.getText().toString();
-                        String password = passwordInput.getText().toString();
-                        signInUser(email, password, auth, context);
-                    }
-                })
-                .setNegativeButton("Register", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String email = emailInput.getText().toString();
-                        String password = passwordInput.getText().toString();
-                        registerUser(email, password, auth, context);
-                    }
-                })
-                .show();
-    }
-
-    // home screen (when button pressed)-> dialog (once signed in)-> grab from database
-
-    private void signInUser(String email, String password, FirebaseAuth auth, Context context) {
-        auth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        // Assuming this is inside a method and 'context' is available
-                        Toast.makeText(context, "Signed in successfully", Toast.LENGTH_SHORT).show();
-                        FirebaseUser user = auth.getCurrentUser();
-
-// Variable to store the fetched access token
-                        final String[] fetchedAccessToken = {null};
-
-                        if (user != null) {
-                            // Get a reference to the Firebase Realtime Database
-                            FirebaseDatabase database = FirebaseDatabase.getInstance();
-                            DatabaseReference ref = database.getReference("users").child(user.getUid()).child("accessToken");
-
-                            // Read the access token from the database
-                            ref.addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                    if (dataSnapshot.exists()) {
-                                        // Get the access token from the database and store it in the local variable
-                                        fetchedAccessToken[0] = dataSnapshot.getValue(String.class);
-                                        Log.d("Firebase", "Access token fetched: " + fetchedAccessToken[0]);
-                                        mAccessToken=fetchedAccessToken[0];
-
-                                        // Here you can now use fetchedAccessToken as needed
-                                        SpotifyApiHelper helper = new SpotifyApiHelper(mAccessToken);
-                                        helper.getUserProfile(new Callback() {
-                                            @Override
-                                            public void onFailure(Call call, IOException e) {
-                                                System.out.println("Request Failed: " + e.getMessage());
-                                            }
-
-                                            @Override
-                                            public void onResponse(Call call, Response response) throws IOException {
-                                                if (response.isSuccessful()) {
-                                                    String responseData = response.body().string();  // Read data on the worker thread
-                                                    System.out.println("Response from server: " + responseData);
-                                                    if (responseData.contains("The access token expired")){
-
-                                                    }
-                                                } else {
-                                                    System.out.println("Response error: " + response.code());
-                                                }
-                                            }
-                                        });
-
-                                        // See whether access token is valid:
-                                        // TODO: get it to check whether token is valid and update accordingly
-                                        // TODO: move the database to a global variable, put into fragments, give user option to recover from saved game
-                                        final AuthorizationRequest request = getAuthenticationRequest(AuthorizationResponse.Type.TOKEN);
-                                        AuthorizationClient.openLoginActivity(MainActivity.this, AUTH_TOKEN_REQUEST_CODE, request);
-
-                                    } else {
-                                        Log.d("Firebase", "Access token not found in the database.");
+                                FirebaseUtils.fetchAccessToken(user, new FirebaseUtils.TokenFetchListener() {
+                                    @Override
+                                    public void onTokenFetched(String token) {
+                                        Log.d("Firebase", "Access token fetched: " + token);
+                                        mAccessToken = token;
+                                        // Proceed with using the token
+                                        handleToken(token);
                                     }
-                                }
 
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) {
-                                    Log.e("Firebase", "Failed to read access token", databaseError.toException());
-                                }
-                            });
-                        } else {
-                            Log.e("Firebase", "No authenticated user found.");
-                        }
-                    } else {
-                        Toast.makeText(context, "Sign in failed", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                                    @Override
+                                    public void onError(String error) {
+                                        Log.e("Firebase", error);
+                                        Toast.makeText(context, error, Toast.LENGTH_LONG).show();
+                                    }
+                                });
+                            } else {
+                                Toast.makeText(context, "Sign in failed: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                            }
+                        });
+            }
+
+            @Override
+            public void onRegister(String email, String password, Context context) {
+                auth.createUserWithEmailAndPassword(email, password)
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(context, "Registered successfully", Toast.LENGTH_SHORT).show();
+                                final AuthorizationRequest request = getAuthenticationRequest(AuthorizationResponse.Type.TOKEN);
+                                AuthorizationClient.openLoginActivity(MainActivity.this, AUTH_TOKEN_REQUEST_CODE, request);
+
+                            } else {
+                                // Get and display the error message
+                                String errorMessage = task.getException().getMessage();
+                                Toast.makeText(context, "Registration failed: " + errorMessage, Toast.LENGTH_LONG).show();
+                            }
+                        });
+            }
+        });
+
     }
 
-    // home screen (when button pressed)-> dialog (once registered)-> open external spotify (once HTTP response received)-> add to database
+    /*
+    Responsiblity: ensure that the token is valid, if it is not, then request the token again
+     */
+    private void handleToken(String token) {
+        SpotifyApiHelper helper = new SpotifyApiHelper(token);
+        helper.getUserProfile(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                System.out.println("Request Failed: " + e.getMessage());
+            }
 
-    private void registerUser(String email, String password, FirebaseAuth auth, Context context) {
-        auth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        Toast.makeText(context, "Registered successfully", Toast.LENGTH_SHORT).show();
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    String responseData = response.body().string();
+                    System.out.println("Response from server: " + responseData);
+                    if (responseData.contains("The access token expired")){
                         final AuthorizationRequest request = getAuthenticationRequest(AuthorizationResponse.Type.TOKEN);
                         AuthorizationClient.openLoginActivity(MainActivity.this, AUTH_TOKEN_REQUEST_CODE, request);
-
-                    } else {
-                        // Get and display the error message
-                        String errorMessage = task.getException().getMessage();
-                        Toast.makeText(context, "Registration failed: " + errorMessage, Toast.LENGTH_LONG).show();
                     }
-                });
+                    // Additional handling if the token expired etc.
+                } else {
+                    System.out.println("Response error: " + response.code());
+                    final AuthorizationRequest request = getAuthenticationRequest(AuthorizationResponse.Type.TOKEN);
+                    AuthorizationClient.openLoginActivity(MainActivity.this, AUTH_TOKEN_REQUEST_CODE, request);
+                }
+            }
+        });
     }
 
     /**
@@ -259,6 +200,9 @@ public class MainActivity extends AppCompatActivity {
      * fetches the result of that external activity to get the response from Spotify
      *
      * In our case - this block of code will run once a response is recieved from the spotify API
+     *
+     * Will save the spotify login info to the users database
+     *
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -271,7 +215,7 @@ public class MainActivity extends AppCompatActivity {
             // setTextAsync("Token: " + mAccessToken, tokenTextView);
             // We retrieve the default database and place the access token in it for this user
             // Assuming auth is already initialized as FirebaseAuth instance
-            FirebaseUser user = auth.getCurrentUser();
+            FirebaseUser user = FirebaseUtils.getInstance().getFirebaseAuth().getCurrentUser();
             if (user != null) {
                 System.out.println("user exists");
                 // Get a reference to the Firebase Realtime Database
@@ -311,18 +255,6 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(MainActivity.this, UserProfileActivity.class);
         intent.putExtra("ACCESS_TOKEN", mAccessToken);
         startActivity(intent);
-    }
-
-
-    /**
-     * Creates a UI thread to update a TextView in the background
-     * Reduces UI latency and makes the system perform more consistently
-     *
-     * @param text the text to set
-     * @param textView TextView object to update
-     */
-    private void setTextAsync(final String text, TextView textView) {
-        runOnUiThread(() -> textView.setText(text));
     }
 
     /**

@@ -21,16 +21,16 @@ public class DialogUtils {
                 .setTitle("Sign In / Register")
                 .setView(layout)
                 .setPositiveButton("Sign In", (dialog, which) -> {
-                    listener.onSignIn(emailInput.getText().toString(), passwordInput.getText().toString());
+                    listener.onSignIn(emailInput.getText().toString(), passwordInput.getText().toString(),context);
                 })
                 .setNegativeButton("Register", (dialog, which) -> {
-                    listener.onRegister(emailInput.getText().toString(), passwordInput.getText().toString());
+                    listener.onRegister(emailInput.getText().toString(), passwordInput.getText().toString(),context);
                 })
                 .show();
     }
 
     public interface AuthDialogListener {
-        void onSignIn(String email, String password);
-        void onRegister(String email, String password);
+        void onSignIn(String email, String password, Context context );
+        void onRegister(String email, String password, Context context);
     }
 }
