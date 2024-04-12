@@ -166,7 +166,7 @@ public class SpotifyApiHelper {
                             System.out.println("middle");
                             JsonNameFinder jnf = new JsonNameFinder();
                             System.out.println(allTracks.size());
-                            System.out.println(allTracks.get(1).length());
+                            // System.out.println(allTracks.get(1).length());
 
                             List<String> names = jnf.findNames(allTracks.get(0)); // This gets the names
                             Set<String> uniqueNames = new HashSet<>(names); // Remove duplicates
