@@ -32,8 +32,10 @@ import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class GameActivity extends AppCompatActivity {
 
@@ -118,6 +120,7 @@ public class GameActivity extends AppCompatActivity {
         WordSearchGenerator wordSearch = new WordSearchGenerator(wordList, difficulty, rowCount, colCount);
         wordSearch.printGrid();
         wordSearch.printWordsWithPositions();
+        Set<String> visited = new HashSet<>();
 
         // Get screen width
         DisplayMetrics displayMetrics = new DisplayMetrics();
@@ -151,19 +154,43 @@ public class GameActivity extends AppCompatActivity {
                             gridButton.setTextColor(Color.WHITE); // Selected text color
                             break;
                         case 2:
-                            List<WordSearchGenerator.GridPosition> positions = wordSearch.get_word_position_from_id(group.get("word"));
-                            for (WordSearchGenerator.GridPosition gp : positions) {
-                                // Assuming you can reference buttons directly by their grid position
-                                Button wordButton = (Button) wordSearchGrid.getChildAt(gp.row * colCount + gp.col);
-                                wordButton.setBackgroundColor(Color.BLUE); // Found word background color
-                                wordButton.setTextColor(Color.WHITE); // Found word text color
-                            }
+                            gridButton.setBackgroundColor(Color.BLUE); // Default background color
+                            gridButton.setTextColor(Color.WHITE); // Default text color
                             break;
+                        case 3:
+                            gridButton.setBackgroundColor(Color.BLACK); // Selected background color
+                            gridButton.setTextColor(Color.WHITE); // Selected text color
+                            break;
+
+                    }
+                    if (group.get("word")!=-1){ // Word found - set accordingly
+                        for (WordSearchGenerator.GridPosition gp: wordSearch.inlets()){
+                            // Assuming you can reference buttons directly by their grid position
+                            Button wordButton = (Button) wordSearchGrid.getChildAt(gp.row * colCount + gp.col);
+                            wordButton.setBackgroundColor(Color.BLUE); // Found word background color
+                            wordButton.setTextColor(Color.WHITE); // Found word text color
+                        }
                     }
                     System.out.println("Tile at (" + finalRow + "," + finalCol + ") touched");
                 });
-                button.setBackgroundColor(Color.WHITE); // Default background color
-                button.setTextColor(Color.BLACK); // Default text color
+                switch (wordSearch.getState(row,col)) {
+                    case 0:
+                        button.setBackgroundColor(Color.WHITE); // Default background color
+                        button.setTextColor(Color.BLACK); // Default text color
+                        break;
+                    case 1:
+                        button.setBackgroundColor(Color.BLACK); // Selected background color
+                        button.setTextColor(Color.WHITE); // Selected text color
+                        break;
+                    case 2:
+                        button.setBackgroundColor(Color.BLUE); // Default background color
+                        button.setTextColor(Color.WHITE); // Default text color
+                        break;
+                    case 3:
+                        button.setBackgroundColor(Color.BLACK); // Selected background color
+                        button.setTextColor(Color.WHITE); // Selected text color
+                        break;
+                }
 
                 wordSearchGrid.addView(button);
             }

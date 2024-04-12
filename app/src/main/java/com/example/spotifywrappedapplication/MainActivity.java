@@ -177,6 +177,10 @@ public class MainActivity extends AppCompatActivity {
                                         mAccessToken=fetchedAccessToken[0];
 
                                         // Here you can now use fetchedAccessToken as needed
+
+                                        // See whether access token is valid:
+
+
                                     } else {
                                         Log.d("Firebase", "Access token not found in the database.");
                                     }
