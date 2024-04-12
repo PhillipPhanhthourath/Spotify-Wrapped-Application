@@ -177,9 +177,32 @@ public class MainActivity extends AppCompatActivity {
                                         mAccessToken=fetchedAccessToken[0];
 
                                         // Here you can now use fetchedAccessToken as needed
+                                        SpotifyApiHelper helper = new SpotifyApiHelper(mAccessToken);
+                                        helper.getUserProfile(new Callback() {
+                                            @Override
+                                            public void onFailure(Call call, IOException e) {
+                                                System.out.println("Request Failed: " + e.getMessage());
+                                            }
+
+                                            @Override
+                                            public void onResponse(Call call, Response response) throws IOException {
+                                                if (response.isSuccessful()) {
+                                                    String responseData = response.body().string();  // Read data on the worker thread
+                                                    System.out.println("Response from server: " + responseData);
+                                                    if (responseData.contains("The access token expired")){
+
+                                                    }
+                                                } else {
+                                                    System.out.println("Response error: " + response.code());
+                                                }
+                                            }
+                                        });
 
                                         // See whether access token is valid:
-
+                                        // TODO: get it to check whether token is valid and update accordingly
+                                        // TODO: move the database to a global variable, put into fragments, give user option to recover from saved game
+                                        final AuthorizationRequest request = getAuthenticationRequest(AuthorizationResponse.Type.TOKEN);
+                                        AuthorizationClient.openLoginActivity(MainActivity.this, AUTH_TOKEN_REQUEST_CODE, request);
 
                                     } else {
                                         Log.d("Firebase", "Access token not found in the database.");
