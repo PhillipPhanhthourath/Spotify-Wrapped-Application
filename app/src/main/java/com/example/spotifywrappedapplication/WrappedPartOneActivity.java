@@ -18,14 +18,24 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.auth.FirebaseUser;
+import com.squareup.picasso.Picasso;
+
+import org.checkerframework.checker.units.qual.A;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -36,15 +46,14 @@ import okhttp3.Callback;
 import okhttp3.Response;
 
 public class WrappedPartOneActivity extends AppCompatActivity {
-    TextView buttonAnchor;
-    TextView title;
-    Button buttonContinue;
-    Button buttonBack;
-    GridLayout frontCard;
-    ImageView[] covers;
-    TextView backCard;
+    private TextView buttonAnchor;
+    private TextView title;
+    private Button buttonContinue;
+    private Button buttonBack;
+    private GridLayout frontCard;
+    private ImageView[] covers;
+    private TextView backCard;
     private SpotifyApiHelper apiHelper;
-    GestureDetector gestureDetector;
 
     private Animation animation(String anim) {
         anim = anim.toLowerCase().trim();
@@ -70,21 +79,72 @@ public class WrappedPartOneActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wrapped_part_one);
 
-        // get picture info from api and set up frontCard
+        // Set up frontCard
         frontCard = findViewById(R.id.front_card);
         covers = new ImageView[]{findViewById(R.id.cover1), findViewById(R.id.cover2), findViewById(R.id.cover3), findViewById(R.id.cover4),
                 findViewById(R.id.cover5), findViewById(R.id.cover6), findViewById(R.id.cover7), findViewById(R.id.cover8),
                 findViewById(R.id.cover9), findViewById(R.id.cover10), findViewById(R.id.cover11), findViewById(R.id.cover12),
                 findViewById(R.id.cover13), findViewById(R.id.cover14), findViewById(R.id.cover15), findViewById(R.id.cover16)};
         frontCard.startAnimation(animation("fade in"));
-        String mAccessToken = getIntent().getStringExtra("ACCESS_TOKEN");
-        apiHelper = new SpotifyApiHelper(mAccessToken);
-        // Get user playlists
-        apiHelper.getImagesFromAllPlaylists(new PlaylistCallbackHandler());
+        // LAYER 1: FETCH TOKEN
+        FirebaseUser user = FirebaseUtils.getInstance().getFirebaseAuth().getCurrentUser();
+        FirebaseUtils.fetchAccessToken(user, new FirebaseUtils.TokenFetchListener() {
+            @Override
+            public void onTokenFetched(String token) {
+                Log.d("Firebase", "Access token fetched: " + token);
+                SpotifyApiHelper helper = new SpotifyApiHelper(token); // Proceed with using the token
 
+                // LAYER 2: FETCH PLAYLISTS
+                helper.getUserPlaylists(new Callback() {
+                    @Override
+                    public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                        Log.e("Spotify API", "Failed to fetch playlists", e);
+                    }
+                    @Override
+                    public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                        if (response.isSuccessful() && response.body() != null) {
+                            try {
+                                JSONObject jsonObject = new JSONObject(response.body().string());
+                                // get 16 playlist images to populate the GridLayout
+                                JSONArray playlists = jsonObject.getJSONArray("items");
+                                ArrayList<String> urls = new ArrayList<>();
+                                for (int i = 0; i < playlists.length() && urls.size() < covers.length; i++) {
+                                    JSONObject playlist = playlists.getJSONObject(i);
+                                    System.out.println(playlist.get("images"));
+                                    if (!playlist.get("images").toString().equals("null")) {
+                                        JSONArray images = playlist.getJSONArray("images");
+                                        for (int j = 0; j < images.length() && urls.size() < covers.length; j++) {
+                                            JSONObject image = images.getJSONObject(j);
+                                            urls.add(image.getString("url"));
+                                            System.out.println(image.getString("url"));
+                                        }
+                                    }
+                                }
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        for (int i = 0; i < covers.length; i++) {
+                                            Picasso.get().load(urls.get(i)).into(covers[i]);
+                                        }
+                                    }
+                                });
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            Log.e("Spotify API", "Response not successful or body is null");
+                        }
+                    }
+                });
+            }
 
+            @Override
+            public void onError(String error) {
+                Log.e("Firebase", error);
+            }
+        });
 
-        // rest of view on arrival to page
+        // Set up rest of view on arrival to page
         backCard = findViewById(R.id.back_card);
         backCard.setVisibility(View.INVISIBLE);
         buttonAnchor = findViewById(R.id.text_anchor);
