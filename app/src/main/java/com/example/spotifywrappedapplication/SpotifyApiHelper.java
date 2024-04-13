@@ -1,4 +1,6 @@
 package com.example.spotifywrappedapplication;
+import android.util.Log;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONArray;
@@ -13,6 +15,7 @@ import okhttp3.ResponseBody;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -22,6 +25,52 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
 class JsonNameFinder {
+
+    public static void printFormattedJson(String json) {
+        try {
+            if (json.trim().startsWith("{")) {
+                JSONObject jsonObject = new JSONObject(json);
+                String formatted = jsonObject.toString(4); // Indentation of 4 spaces
+                Log.d("Formatted JSON", formatted);
+            } else if (json.trim().startsWith("[")) {
+                JSONArray jsonArray = new JSONArray(json);
+                String formatted = jsonArray.toString(4); // Indentation of 4 spaces
+                Log.d("Formatted JSON", formatted);
+            }
+        } catch (JSONException e) {
+            Log.e("JSON Formatter", "Invalid JSON format", e);
+        }
+    }
+
+    public static Map<String, List<Map<String, String>>> parsePlaylists(String jsonString) {
+        Map<String, List<Map<String, String>>> playlistsMap = new HashMap<>();
+
+        try {
+            JSONObject jsonObject = new JSONObject(jsonString);
+            JSONArray playlists = jsonObject.getJSONArray("playlists");
+
+            for (int i = 0; i < playlists.length(); i++) {
+                JSONObject playlist = playlists.getJSONObject(i);
+                String playlistName = playlist.getString("name");
+                JSONArray tracks = playlist.getJSONArray("tracks");
+
+                List<Map<String, String>> tracksList = new ArrayList<>();
+
+                for (int j = 0; j < tracks.length(); j++) {
+                    JSONObject track = tracks.getJSONObject(j);
+                    Map<String, String> artistSongPair = new HashMap<>();
+                    artistSongPair.put(track.getString("artist"), track.getString("song"));
+                    tracksList.add(artistSongPair);
+                }
+
+                playlistsMap.put(playlistName, tracksList);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return playlistsMap;
+    }
     /*
     Useful for finding names of songs / artists in spotify wrapped json text
      */
@@ -123,9 +172,10 @@ public class SpotifyApiHelper {
                     JSONArray playlists = jsonObject.getJSONArray("items");
                     int playlistCount = playlists.length();
                     CountDownLatch countDownLatch = new CountDownLatch(playlistCount);
-                    List<String> allTracks = new ArrayList<>();
+                    final List<String> allTracks = new ArrayList<>(Collections.nCopies(playlists.length(), null));
 
                     for (int i = 0; i < playlists.length(); i++) {
+                        final int index = i;
                         JSONObject playlist = playlists.getJSONObject(i);
                         String playlistId = playlist.getString("id");
 
@@ -149,7 +199,7 @@ public class SpotifyApiHelper {
                                         String trackResponseBody = response.body().string();
                                         // Here you could parse and add to allTracks list
                                         // For demonstration, just adding raw JSON string
-                                        allTracks.add(trackResponseBody);
+                                        allTracks.set(index,trackResponseBody);
                                     }
                                 } finally {
                                     countDownLatch.countDown();
@@ -165,8 +215,6 @@ public class SpotifyApiHelper {
                             // Here concatenate all tracks and use finalCallback to return them
                             System.out.println("middle");
                             JsonNameFinder jnf = new JsonNameFinder();
-                            System.out.println(allTracks.size());
-                            // System.out.println(allTracks.get(1).length());
 
                             List<String> names = jnf.findNames(allTracks.get(0)); // This gets the names
                             Set<String> uniqueNames = new HashSet<>(names); // Remove duplicates
@@ -185,7 +233,7 @@ public class SpotifyApiHelper {
                             System.out.println(result);
                              */
 
-                            String concatenatedTracks = "["+String.join(",", allTracks)+"]"; // Simplified
+                            String concatenatedTracks = "["+responseBody+","+String.join(",", allTracks)+"]"; // Simplified
                             Response concatenatedResponse = new Response.Builder()
                                     .request(call.request())
                                     .protocol(Protocol.HTTP_1_1)

@@ -1,14 +1,31 @@
 package com.example.spotifywrappedapplication;
+import androidx.lifecycle.ViewModelProvider;
+import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.ValueEventListener;
 import com.spotify.sdk.android.auth.AuthorizationClient;
 import com.spotify.sdk.android.auth.AuthorizationRequest;
 import com.spotify.sdk.android.auth.AuthorizationResponse;
@@ -25,6 +42,8 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
+    private SharedViewModel viewModel;
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     public static final String CLIENT_ID = "895a2c54c32f4d9f98521f688d964af9";
     public static final String REDIRECT_URI = "spotifywrappedapplication://auth";
@@ -58,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
         // Set the click listeners for the buttons
 
         loginBtn.setOnClickListener((v) -> {
-            getToken();
+            handleSignIn();
         });
 
         codeBtn.setOnClickListener((v) -> {
@@ -72,14 +91,97 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Get token from Spotify
-     * This method will open the Spotify login activity and get the token
-     * What is token?
-     * https://developer.spotify.com/documentation/general/guides/authorization-guide/
+     * Performs the appropriate actions for log in user, and register user
+     * Log in user: populate the Authenticator auth with user credentials
+     * - will retrieve spotify access token saved in users account, check if valid, prompt spotify login if it isn't
+     * Register user: populate the Authenticator auth with user credentials
+     * - prompt spotify login
      */
-    public void getToken() {
-        final AuthorizationRequest request = getAuthenticationRequest(AuthorizationResponse.Type.TOKEN);
-        AuthorizationClient.openLoginActivity(MainActivity.this, AUTH_TOKEN_REQUEST_CODE, request);
+    public void handleSignIn() {
+
+        FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        firebaseAnalytics.logEvent("your_custom_event_name", null);
+
+        //showAuthDialog(this);
+        FirebaseAuth auth= FirebaseUtils.getInstance().getFirebaseAuth();
+        DialogUtils.showSignInDialog(this, new DialogUtils.AuthDialogListener(){
+            @Override
+            public void onSignIn(String email, String password, Context context) {
+                auth.signInWithEmailAndPassword(email, password)
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(context, "Signed in successfully", Toast.LENGTH_SHORT).show();
+                                FirebaseUser user = auth.getCurrentUser();
+
+                                FirebaseUtils.fetchAccessToken(user, new FirebaseUtils.TokenFetchListener() {
+                                    @Override
+                                    public void onTokenFetched(String token) {
+                                        Log.d("Firebase", "Access token fetched: " + token);
+                                        mAccessToken = token;
+                                        // Proceed with using the token
+                                        handleToken(token);
+                                    }
+
+                                    @Override
+                                    public void onError(String error) {
+                                        Log.e("Firebase", error);
+                                        Toast.makeText(context, error, Toast.LENGTH_LONG).show();
+                                    }
+                                });
+                            } else {
+                                Toast.makeText(context, "Sign in failed: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                            }
+                        });
+            }
+
+            @Override
+            public void onRegister(String email, String password, Context context) {
+                auth.createUserWithEmailAndPassword(email, password)
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(context, "Registered successfully", Toast.LENGTH_SHORT).show();
+                                final AuthorizationRequest request = getAuthenticationRequest(AuthorizationResponse.Type.TOKEN);
+                                AuthorizationClient.openLoginActivity(MainActivity.this, AUTH_TOKEN_REQUEST_CODE, request);
+
+                            } else {
+                                // Get and display the error message
+                                String errorMessage = task.getException().getMessage();
+                                Toast.makeText(context, "Registration failed: " + errorMessage, Toast.LENGTH_LONG).show();
+                            }
+                        });
+            }
+        });
+
+    }
+
+    /*
+    Responsiblity: ensure that the token is valid, if it is not, then request the token again
+     */
+    private void handleToken(String token) {
+        SpotifyApiHelper helper = new SpotifyApiHelper(token);
+        helper.getUserProfile(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                System.out.println("Request Failed: " + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    String responseData = response.body().string();
+                    System.out.println("Response from server: " + responseData);
+                    if (responseData.contains("The access token expired")){
+                        final AuthorizationRequest request = getAuthenticationRequest(AuthorizationResponse.Type.TOKEN);
+                        AuthorizationClient.openLoginActivity(MainActivity.this, AUTH_TOKEN_REQUEST_CODE, request);
+                    }
+                    // Additional handling if the token expired etc.
+                } else {
+                    System.out.println("Response error: " + response.code());
+                    final AuthorizationRequest request = getAuthenticationRequest(AuthorizationResponse.Type.TOKEN);
+                    AuthorizationClient.openLoginActivity(MainActivity.this, AUTH_TOKEN_REQUEST_CODE, request);
+                }
+            }
+        });
     }
 
     /**
@@ -88,15 +190,21 @@ public class MainActivity extends AppCompatActivity {
      * What is code?
      * https://developer.spotify.com/documentation/general/guides/authorization-guide/
      */
+    @SuppressLint("RestrictedApi")
     public void getCode() {
-        final AuthorizationRequest request = getAuthenticationRequest(AuthorizationResponse.Type.CODE);
-        AuthorizationClient.openLoginActivity(MainActivity.this, AUTH_CODE_REQUEST_CODE, request);
+
+        // Registration succeeded, get the user info
     }
 
 
     /**
      * When the app leaves this activity to momentarily get a token/code, this function
      * fetches the result of that external activity to get the response from Spotify
+     *
+     * In our case - this block of code will run once a response is recieved from the spotify API
+     *
+     * Will save the spotify login info to the users database
+     *
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -107,6 +215,29 @@ public class MainActivity extends AppCompatActivity {
         if (AUTH_TOKEN_REQUEST_CODE == requestCode) {
             mAccessToken = response.getAccessToken();
             // setTextAsync("Token: " + mAccessToken, tokenTextView);
+            // We retrieve the default database and place the access token in it for this user
+            // Assuming auth is already initialized as FirebaseAuth instance
+            FirebaseUser user = FirebaseUtils.getInstance().getFirebaseAuth().getCurrentUser();
+            if (user != null) {
+                System.out.println("user exists");
+                // Get a reference to the Firebase Realtime Database
+                FirebaseDatabase database = FirebaseDatabase.getInstance();
+                DatabaseReference userRef = database.getReference("users").child(user.getUid());
+
+                // Store the access token in the database under this user's node
+                userRef.child("accessToken").setValue(mAccessToken)
+                        .addOnSuccessListener(aVoid -> {
+                            // Data save was successful!
+                            Log.d("Firebase", "AccessToken saved successfully.");
+                        })
+                        .addOnFailureListener(e -> {
+                            // Failed to save the data
+                            Log.e("Firebase", "Failed to save accessToken", e);
+                        });
+            } else {
+                // Handle the case where there is no authenticated user
+                Log.e("Firebase", "No authenticated user found.");
+            }
 
         } else if (AUTH_CODE_REQUEST_CODE == requestCode) {
             mAccessCode = response.getCode();
@@ -126,18 +257,6 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(MainActivity.this, WelcomeScreenActivity.class);
         intent.putExtra("ACCESS_TOKEN", mAccessToken);
         startActivity(intent);
-    }
-
-
-    /**
-     * Creates a UI thread to update a TextView in the background
-     * Reduces UI latency and makes the system perform more consistently
-     *
-     * @param text the text to set
-     * @param textView TextView object to update
-     */
-    private void setTextAsync(final String text, TextView textView) {
-        runOnUiThread(() -> textView.setText(text));
     }
 
     /**

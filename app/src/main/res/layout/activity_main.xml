@@ -54,7 +54,7 @@
             android:layout_width="206dp"
             android:layout_height="47dp"
             android:layout_marginTop="32dp"
-            android:text="@string/request_code"
+            android:text="Save Credentials"
             app:layout_constraintEnd_toEndOf="@id/spotify_login_btn"
             app:layout_constraintHorizontal_bias="0.444"
             app:layout_constraintStart_toStartOf="@id/spotify_login_btn"

@@ -1,5 +1,6 @@
 package com.example.spotifywrappedapplication;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,9 @@ public class WordSearchGenerator {
     private final int difficulty;
     private final List<List<GridPosition>> wordPositions;
     private final Random random = new Random();
+    HashSet<GridPosition> count_selected;
+
+    HashSet<String> visited;
 
     public List<String> getWords(){
         return words;
@@ -38,10 +42,12 @@ public class WordSearchGenerator {
     }
 
     public WordSearchGenerator(List<String> words, int difficulty, int rows, int cols) {
+        this.visited = new HashSet<>();
+        this.count_selected = new HashSet<>();
         this.words = new ArrayList<>(processWords(words,rows));
         this.difficulty = difficulty;
         this.grid = new char[rows][cols];
-        this.stateGrid = new int[rows][cols];
+        this.stateGrid = new int[rows][cols]; // state of each letter - unselected, selected, found unselected, found selected
         this.wordPositions = new ArrayList<>();
         initializeGrid();
         placeWords();
@@ -54,6 +60,24 @@ public class WordSearchGenerator {
         GridPosition(int row, int col) {
             this.row = row;
             this.col = col;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            GridPosition that = (GridPosition) o;
+
+            return row == that.row && col == that.col;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = 17;
+            result = 31 * result + row;
+            result = 31 * result + col;
+            return result;
         }
     }
 
@@ -136,35 +160,56 @@ public class WordSearchGenerator {
         return String.valueOf(grid[row][col]);
     }
 
+    //Returns the state
+    public int getState(int row, int col){
+        return stateGrid[row][col];
+    }
+
+    //Updates the state
     public Map<String, Integer> tap(int row, int col) {
         if (stateGrid[row][col] == 0) {
             stateGrid[row][col] = 1; // Selected
+            count_selected.add(new GridPosition(row,col));
         } else if (stateGrid[row][col] == 1) {
             stateGrid[row][col] = 0; // Unselected
+            count_selected.remove(new GridPosition(row,col));
+        } else if (stateGrid[row][col] == 2) {
+            stateGrid[row][col] = 3; // Selected (part of prev found word)
+            count_selected.add(new GridPosition(row,col));
+        } else if (stateGrid[row][col] == 3){
+            stateGrid[row][col] = 2; // Selected (part of prev found word)
+            count_selected.remove(new GridPosition(row,col));
         }
+
+        Map<String, Integer> result = new HashMap<>();
+        result.put("state",stateGrid[row][col]);
+        result.put("word",-1);
 
         // Check if a word is found
         int wordi=0;
         for (List<GridPosition> wordPosition : wordPositions) {
-            if (wordPosition.stream().allMatch(pos -> stateGrid[pos.row][pos.col] == 1)) {
+            if (count_selected.equals(new HashSet<>(wordPosition))) { // Found
                 for (GridPosition pos : wordPosition) {
-                    stateGrid[pos.row][pos.col] = 2; // Found
+                    stateGrid[pos.row][pos.col] = 2;
                 }
-                Map<String, Integer> result = new HashMap<>();
-                result.put("state",2);
+                this.visited.add(words.get(wordi));
                 result.put("word",wordi);
                 return result; // Return the positions of the found word
             }
             wordi++;
         }
-        Map<String, Integer> result = new HashMap<>();
-        result.put("state",stateGrid[row][col]);
-        result.put("word",-1);
+
         return result; // No word found
     }
 
-    public List<GridPosition> get_word_position_from_id(int id){
-        return this.wordPositions.get(id);
+    // Returns and removes the current selection
+    public HashSet<GridPosition> inlets (){
+        HashSet<GridPosition> clone = new HashSet<>();
+        for (GridPosition gp : this.count_selected){
+            clone.add(gp);
+        }
+        this.count_selected=new HashSet<>();
+        return clone;
     }
 
     public void printGrid() {

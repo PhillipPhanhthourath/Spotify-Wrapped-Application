@@ -34,7 +34,10 @@ import javax.security.auth.callback.CallbackHandler;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
+<<<<<<< HEAD
 
+=======
+>>>>>>> riley
 public class WrappedPartOneActivity extends AppCompatActivity {
     TextView buttonAnchor;
     TextView title;
@@ -126,7 +129,7 @@ public class WrappedPartOneActivity extends AppCompatActivity {
      * Continue onwards in the Wrapped Summary
      */
     public void continueToGame() {
-        Intent intent = new Intent(WrappedPartOneActivity.this, GameActivity.class);
+        Intent intent = new Intent(WrappedPartOneActivity.this, GameNavActivity.class);
         intent.putExtra("ACCESS_TOKEN", getIntent().getStringExtra("ACCESS_TOKEN"));
         startActivity(intent);
     }
