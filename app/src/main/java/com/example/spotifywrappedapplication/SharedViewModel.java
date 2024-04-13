@@ -18,5 +18,13 @@ public class SharedViewModel extends ViewModel {
     public LiveData<FragmentData> getComplexData() {
         return complexData;
     }
+
+    // Method to store data in Firebase
+
+    public void storeDataInFirebase() {
+        // Assuming you have a method to handle Firebase operations
+        //FirebaseUtils.storeComplexObject(this.complexData);
+    }
+
 }
 

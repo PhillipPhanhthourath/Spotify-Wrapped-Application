@@ -59,14 +59,14 @@ public class FullScreenRedFragment extends Fragment {
         Button exitButton = view.findViewById(R.id.exitButton);
         exitButton.setOnClickListener(v -> {
             // Launch an asynchronous process to save the data to firebase
-
+            viewModel.storeDataInFirebase();
 
             // Handle back press or exit
             if (getActivity() != null) {
                 getActivity().getSupportFragmentManager().popBackStack();
                 getActivity().findViewById(R.id.recyclerView).setVisibility(View.VISIBLE);  // Show RecyclerView
                 getActivity().findViewById(R.id.openAlertButton).setVisibility(View.VISIBLE);  // Show Button
-                getActivity().findViewById(R.id.bottom_navigation).setVisibility(View.VISIBLE);
+                getActivity().findViewById(R.id.back_to_stats_button).setVisibility(View.VISIBLE);
             }
         });
         return view;

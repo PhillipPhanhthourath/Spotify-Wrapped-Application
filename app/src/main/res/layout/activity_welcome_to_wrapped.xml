@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background_lightning_bolt"
+    tools:context=".WelcomeScreenActivity">
+
+    <Button
+        android:id="@+id/back_button"
+        android:layout_width="90dp"
+        android:layout_height="46dp"
+        android:background="@drawable/rounded_button"
+        android:fontFamily="@font/sen_bold"
+        android:padding="5dp"
+        android:text="@string/back"
+        android:textColor="#FAFAFA"
+        android:textSize="11sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/flying_text"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.425" />
+
+    <TextView
+        android:id="@+id/flying_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="300dp"
+        android:fontFamily="@font/sen_bold"
+        android:text="@string/welcome"
+        android:textAlignment="center"
+        android:textColor="#FDFDFD"
+        android:textSize="45sp"
+        android:textStyle="bold"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@id/continue_button"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/continue_button"
+        android:layout_width="90dp"
+        android:layout_height="46dp"
+        android:layout_marginTop="100dp"
+        android:background="@drawable/rounded_button"
+        android:fontFamily="@font/sen_bold"
+        android:padding="5dp"
+        android:text="@string/cont"
+        android:textColor="#FAFAFA"
+        android:textSize="11sp"
+        android:textStyle="bold"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/flying_text" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

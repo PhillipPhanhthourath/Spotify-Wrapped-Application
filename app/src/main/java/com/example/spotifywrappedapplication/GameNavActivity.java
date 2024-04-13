@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseUser;
 
 import org.json.JSONArray;
@@ -129,23 +130,13 @@ public class GameNavActivity extends AppCompatActivity implements PlaceholderAda
                 }
             });
         });
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
-        bottomNavigationView.setSelectedItemId(R.id.navigation_game);
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+        MaterialButton backButton = findViewById(R.id.back_to_stats_button);
+        backButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                Intent intent;
-                if (item.getItemId() == R.id.navigation_user_profile) {
-                    // Navigate to UserProfileActivity
-                    intent = new Intent(GameNavActivity.this, UserProfileActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                    startActivity(intent);
-                    return true;
-                } else if (item.getItemId() == R.id.navigation_game) {
-                    // We're already in GameActivity, no need to do anything
-                    return true;
-                }
-                return false;
+            public void onClick(View view) {
+                // Implement your navigation logic here
+                // This might involve finishing the current activity or navigating with a NavController
+                finish();  // For example, if this button is meant to close the current activity
             }
         });
     }
@@ -156,7 +147,7 @@ public class GameNavActivity extends AppCompatActivity implements PlaceholderAda
         // Hid the components in the current view
         recyclerView.setVisibility(View.GONE);  // Hide RecyclerView
         findViewById(R.id.openAlertButton).setVisibility(View.GONE);  // Hide Button
-        findViewById(R.id.bottom_navigation).setVisibility(View.GONE);
+        findViewById(R.id.back_to_stats_button).setVisibility(View.GONE);
         // Make a fragment with the new page
         // Assume you retrieve or create the object here
         viewModel.setComplexData(fragmentData);

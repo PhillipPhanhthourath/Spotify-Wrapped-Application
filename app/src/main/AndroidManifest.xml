@@ -16,6 +16,12 @@
             android:name=".GameNavActivity"
             android:exported="false" />
         <activity
+            android:name=".WelcomeScreenActivity"
+            android:exported="false" />
+        <activity
+            android:name=".WrappedPartOneActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
