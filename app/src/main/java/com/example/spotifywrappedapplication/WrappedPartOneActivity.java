@@ -34,10 +34,7 @@ import javax.security.auth.callback.CallbackHandler;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
-<<<<<<< HEAD
 
-=======
->>>>>>> riley
 public class WrappedPartOneActivity extends AppCompatActivity {
     TextView buttonAnchor;
     TextView title;
