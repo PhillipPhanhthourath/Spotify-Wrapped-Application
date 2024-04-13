@@ -12,6 +12,7 @@
     <string name="welcome">Welcome\nto\nYour Wrapped</string>
     <string name="back">Back</string>
     <string name="game">Game</string>
-    <string name="part_one_text">Your Top 10 Playlists</string>
+    <string name="part_one_text">Your Top Playlists</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="random_text">Random Text\nPlaylist Names\nMore Names</string>
 </resources>

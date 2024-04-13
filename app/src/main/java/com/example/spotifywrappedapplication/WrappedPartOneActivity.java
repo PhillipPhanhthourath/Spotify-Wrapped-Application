@@ -79,13 +79,15 @@ public class WrappedPartOneActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wrapped_part_one);
 
-        // Set up frontCard
+        // Set up frontCard and backCard
         frontCard = findViewById(R.id.front_card);
         covers = new ImageView[]{findViewById(R.id.cover1), findViewById(R.id.cover2), findViewById(R.id.cover3), findViewById(R.id.cover4),
                 findViewById(R.id.cover5), findViewById(R.id.cover6), findViewById(R.id.cover7), findViewById(R.id.cover8),
                 findViewById(R.id.cover9), findViewById(R.id.cover10), findViewById(R.id.cover11), findViewById(R.id.cover12),
                 findViewById(R.id.cover13), findViewById(R.id.cover14), findViewById(R.id.cover15), findViewById(R.id.cover16)};
         frontCard.startAnimation(animation("fade in"));
+        backCard = findViewById(R.id.back_card);
+        backCard.setVisibility(View.INVISIBLE);
         // LAYER 1: FETCH TOKEN
         FirebaseUser user = FirebaseUtils.getInstance().getFirebaseAuth().getCurrentUser();
         FirebaseUtils.fetchAccessToken(user, new FirebaseUtils.TokenFetchListener() {
@@ -105,27 +107,30 @@ public class WrappedPartOneActivity extends AppCompatActivity {
                         if (response.isSuccessful() && response.body() != null) {
                             try {
                                 JSONObject jsonObject = new JSONObject(response.body().string());
-                                // get 16 playlist images to populate the GridLayout
+                                // get playlist images to populate the frontCard
                                 JSONArray playlists = jsonObject.getJSONArray("items");
                                 ArrayList<String> urls = new ArrayList<>();
+                                ArrayList<String> names = new ArrayList<>();
                                 for (int i = 0; i < playlists.length() && urls.size() < covers.length; i++) {
                                     JSONObject playlist = playlists.getJSONObject(i);
                                     System.out.println(playlist.get("images"));
                                     if (!playlist.get("images").toString().equals("null")) {
                                         JSONArray images = playlist.getJSONArray("images");
-                                        for (int j = 0; j < images.length() && urls.size() < covers.length; j++) {
-                                            JSONObject image = images.getJSONObject(j);
-                                            urls.add(image.getString("url"));
-                                            System.out.println(image.getString("url"));
-                                        }
+                                        urls.add(images.getJSONObject(0).getString("url"));
                                     }
+                                    names.add(playlist.getString("name"));
                                 }
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        for (int i = 0; i < covers.length; i++) {
+                                        for (int i = 0; i < covers.length && i < urls.size(); i++) {
                                             Picasso.get().load(urls.get(i)).into(covers[i]);
                                         }
+                                        String backCardText = "";
+                                        for (int i = 0; i < names.size() && i < 10; i++) {
+                                            backCardText += names.get(i) + "\n";
+                                        }
+                                        backCard.setText(backCardText);
                                     }
                                 });
                             } catch (JSONException e) {
@@ -145,8 +150,6 @@ public class WrappedPartOneActivity extends AppCompatActivity {
         });
 
         // Set up rest of view on arrival to page
-        backCard = findViewById(R.id.back_card);
-        backCard.setVisibility(View.INVISIBLE);
         buttonAnchor = findViewById(R.id.text_anchor);
         title = findViewById(R.id.part_one_text);
         buttonBack = findViewById(R.id.back_button);

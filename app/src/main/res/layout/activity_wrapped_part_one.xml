@@ -64,8 +64,9 @@
         android:layout_height="300dp"
         android:layout_margin="75dp"
         android:background="#65FF3B"
+        android:columnCount="4"
+        android:rowCount="4"
         app:layout_constraintBottom_toTopOf="@id/continue_button"
-        app:layout_constraintHorizontal_bias="0.54"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/back_button"
@@ -79,8 +80,7 @@
             android:layout_rowWeight="1"
             android:layout_columnWeight="1"
             android:scaleType="centerCrop"
-            android:src="@drawable/ic_game"
-            grid:layout_gravity="center" />
+            android:src="@drawable/ic_game"/>
 
         <ImageView
             android:id="@+id/cover2"
@@ -89,8 +89,7 @@
             android:layout_rowWeight="1"
             android:layout_columnWeight="1"
             android:scaleType="centerCrop"
-            android:src="@drawable/ic_game"
-            grid:layout_gravity="center" />
+            android:src="@drawable/ic_game"/>
 
         <ImageView
             android:id="@+id/cover3"
@@ -237,17 +236,20 @@
         android:id="@+id/back_card"
         android:layout_width="300dp"
         android:layout_height="300dp"
-        android:background="#FFEB3B"
         android:layout_margin="75dp"
+        android:gravity="center"
+        android:background="#FFEB3B"
         android:fontFamily="@font/sen_bold"
+        android:text="@string/random_text"
+        android:textColor="#000000"
+        android:textSize="20sp"
+        android:lineSpacingMultiplier="1.2"
         app:layout_constraintBottom_toTopOf="@id/continue_button"
-        app:layout_constraintHorizontal_bias="0.54"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/back_button"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0">
-    </TextView>
+        app:layout_constraintVertical_bias="1.0"/>
 
     <Button
         android:id="@+id/continue_button"
