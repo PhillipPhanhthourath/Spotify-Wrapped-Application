@@ -256,7 +256,7 @@ public class SpotifyApiHelper {
         });
     }
 
-    public void getCurrentlyPlayingTrack(Callback callback) {
+    /*public void getCurrentlyPlayingTrack(Callback callback) {
         String url = "https://api.spotify.com/v1/me/player/currently-playing";
         Request request = new Request.Builder()
                 .url(url)
@@ -264,7 +264,7 @@ public class SpotifyApiHelper {
                 .build();
 
         client.newCall(request).enqueue(callback);
-    }
+    }*/
 
     // Example usage
     public static void main(String[] args) {
@@ -297,7 +297,7 @@ public class SpotifyApiHelper {
             }
         });
 
-        // Get currently playing track
+        /* Get currently playing track
         apiHelper.getCurrentlyPlayingTrack(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -309,5 +309,6 @@ public class SpotifyApiHelper {
                 System.out.println("Currently Playing Track: " + response.body().string());
             }
         });
+        */
     }
 }

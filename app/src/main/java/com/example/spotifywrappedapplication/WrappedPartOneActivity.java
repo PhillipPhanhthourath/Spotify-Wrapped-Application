@@ -80,7 +80,7 @@ public class WrappedPartOneActivity extends AppCompatActivity {
         String mAccessToken = getIntent().getStringExtra("ACCESS_TOKEN");
         apiHelper = new SpotifyApiHelper(mAccessToken);
         // Get user playlists
-        // apiHelper.getImagesFromAllPlaylists(new PlaylistCallbackHandler());
+        apiHelper.getImagesFromAllPlaylists(new PlaylistCallbackHandler());
 
 
 
@@ -104,13 +104,12 @@ public class WrappedPartOneActivity extends AppCompatActivity {
             continueToGame();
         });
 
-        gestureDetector = new GestureDetector(this, new GestureListener());
-        View rootView = findViewById(android.R.id.content);
-        rootView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return gestureDetector.onTouchEvent(event);
-            }
+        frontCard.setOnClickListener((v) -> {
+            flipCard();
+        });
+
+        backCard.setOnClickListener((v) -> {
+            flipCard();
         });
     }
 
@@ -131,6 +130,24 @@ public class WrappedPartOneActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    /**
+     * flips the card
+     */
+    public void flipCard() {
+        if (backCard.getVisibility() == View.INVISIBLE) {
+            frontCard.startAnimation(animation("fade out"));
+            frontCard.setVisibility(View.INVISIBLE);
+            backCard.setVisibility(View.VISIBLE);
+            backCard.startAnimation(animation("fade in"));
+        } else {
+            backCard.startAnimation(animation("fade out"));
+            backCard.setVisibility(View.INVISIBLE);
+            frontCard.setVisibility(View.VISIBLE);
+            frontCard.startAnimation(animation("fade in"));
+        }
+    }
+
+    /**
     private class GestureListener extends GestureDetector.SimpleOnGestureListener {
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
@@ -144,6 +161,7 @@ public class WrappedPartOneActivity extends AppCompatActivity {
                     && e.getY() >= (centerY - 150) && e.getY() <= (centerY + 150)) {
                 // perform animation
                 frontCard.startAnimation(animation("fade out"));
+                frontCard.setVisibility(View.INVISIBLE);
                 backCard.setVisibility(View.VISIBLE);
                 backCard.startAnimation(animation("fade in"));
                 // get info from API
@@ -157,6 +175,7 @@ public class WrappedPartOneActivity extends AppCompatActivity {
             return false;
         }
     }
+     **/
 
     private class PlaylistCallbackHandler implements Callback {
         private List<String> artistList = new ArrayList<>();
