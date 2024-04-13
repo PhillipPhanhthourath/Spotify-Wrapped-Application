@@ -34,14 +34,6 @@
                     android:scheme="spotifywrappedapplication" />
             </intent-filter>
         </activity>
-        <activity android:name=".WelcomeScreenActivity"
-            android:exported="false">
-            <!-- Add any additional configurations for UserProfileActivity here -->
-        </activity>
-        <activity android:name=".WrappedPartOneActivity"
-            android:exported="false">
-            <!-- Add any additional configurations for UserProfileActivity here -->
-        </activity>
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
