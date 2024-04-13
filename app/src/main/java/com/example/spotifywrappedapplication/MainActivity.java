@@ -1,4 +1,5 @@
 package com.example.spotifywrappedapplication;
+import androidx.lifecycle.ViewModelProvider;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -41,6 +42,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
+    private SharedViewModel viewModel;
     private FirebaseAnalytics mFirebaseAnalytics;
 
     public static final String CLIENT_ID = "895a2c54c32f4d9f98521f688d964af9";
