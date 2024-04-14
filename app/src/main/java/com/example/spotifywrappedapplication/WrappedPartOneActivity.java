@@ -5,10 +5,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -30,9 +31,6 @@ import okhttp3.Callback;
 import okhttp3.Response;
 
 public class WrappedPartOneActivity extends AppCompatActivity {
-    private TextView title, tapPrompt;
-    private Button buttonNext;
-    private Button buttonBack;
     private GridLayout frontCard;
     private ImageView[] covers;
     private TextView backCard;
@@ -43,11 +41,12 @@ public class WrappedPartOneActivity extends AppCompatActivity {
         setContentView(R.layout.activity_summary);
 
         // Set up frontCard and backCard
-        frontCard = findViewById(R.id.grid_image_card);
         covers = new ImageView[]{findViewById(R.id.cover1), findViewById(R.id.cover2), findViewById(R.id.cover3), findViewById(R.id.cover4),
                 findViewById(R.id.cover5), findViewById(R.id.cover6), findViewById(R.id.cover7), findViewById(R.id.cover8),
                 findViewById(R.id.cover9), findViewById(R.id.cover10), findViewById(R.id.cover11), findViewById(R.id.cover12),
                 findViewById(R.id.cover13), findViewById(R.id.cover14), findViewById(R.id.cover15), findViewById(R.id.cover16)};
+        frontCard = findViewById(R.id.grid_image_card);
+        frontCard.setVisibility(View.VISIBLE);
         frontCard.startAnimation(WrappedHelper.animation(this, "fade in"));
         backCard = findViewById(R.id.text_card);
         backCard.setVisibility(View.INVISIBLE);
@@ -59,7 +58,7 @@ public class WrappedPartOneActivity extends AppCompatActivity {
                 Log.d("Firebase", "Access token fetched: " + token);
                 SpotifyApiHelper helper = new SpotifyApiHelper(token); // Proceed with using the token
 
-                // LAYER 2: FETCH PLAYLISTS
+                // LAYER 2: FETCH GENRES
                 helper.getUserPlaylists(new Callback() {
                     @Override
                     public void onFailure(@NonNull Call call, @NonNull IOException e) {
@@ -142,26 +141,25 @@ public class WrappedPartOneActivity extends AppCompatActivity {
         });
 
         // Set up rest of view on arrival to page
-        title = findViewById(R.id.title_text);
-        tapPrompt = findViewById(R.id.tap_prompt);
-        buttonBack = findViewById(R.id.back_button);
-        buttonNext = findViewById(R.id.continue_button);
+        TextView title = findViewById(R.id.title_text);
+        TextView tapPrompt = findViewById(R.id.tap_prompt);
+        Button buttonBack = findViewById(R.id.back_button);
+        Button buttonNext = findViewById(R.id.continue_button);
         title.startAnimation(WrappedHelper.animation(this, "fade in"));
         Animation fadeInSlow = WrappedHelper.animation(this, "fade in");
-        fadeInSlow.setDuration(5000);
+        tapPrompt.setVisibility(View.VISIBLE);
         tapPrompt.startAnimation(fadeInSlow);
-        frontCard.startAnimation(fadeInSlow);
         buttonNext.startAnimation(WrappedHelper.animation(this, "fade in"));
         buttonBack.startAnimation(WrappedHelper.animation(this, "fade in"));
 
 
         // Set the click listeners for the buttons & gesture detector
         buttonBack.setOnClickListener((v) -> {
-            returnToMain();
+            returnToPartOne();
         });
 
         buttonNext.setOnClickListener((v) -> {
-            continueToPartTwo();
+            continueToGame();
         });
 
         frontCard.setOnClickListener((v) -> {
@@ -176,7 +174,7 @@ public class WrappedPartOneActivity extends AppCompatActivity {
     /**
      * Return to the main page
      */
-    public void returnToMain() {
+    protected void returnToPartOne() {
         Intent intent = new Intent(WrappedPartOneActivity.this, MainActivity.class);
         startActivity(intent);
     }
@@ -184,7 +182,7 @@ public class WrappedPartOneActivity extends AppCompatActivity {
     /**
      * Continue onwards in the Wrapped Summary
      */
-    public void continueToPartTwo() {
+    protected void continueToGame() {
         Intent intent = new Intent(WrappedPartOneActivity.this, WrappedPartTwoActivity.class);
         intent.putExtra("ACCESS_TOKEN", getIntent().getStringExtra("ACCESS_TOKEN"));
         startActivity(intent);

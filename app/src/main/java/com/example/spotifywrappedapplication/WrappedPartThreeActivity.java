@@ -1,12 +1,16 @@
 package com.example.spotifywrappedapplication;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -28,27 +32,22 @@ import okhttp3.Callback;
 import okhttp3.Response;
 
 public class WrappedPartThreeActivity extends AppCompatActivity {
-    private TextView title;
-    private Button buttonNext;
-    private Button buttonBack;
-    private GridLayout frontCard;
-    private ImageView[] covers;
-    private TextView backCard;
+    private LinearLayout frontCard;
+    private LinearLayout backCard;
 
+    @SuppressLint("CutPasteId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_summary);
 
         // Set up frontCard and backCard
-        frontCard = findViewById(R.id.grid_image_card);
-        covers = new ImageView[]{findViewById(R.id.cover1), findViewById(R.id.cover2), findViewById(R.id.cover3), findViewById(R.id.cover4),
-                findViewById(R.id.cover5), findViewById(R.id.cover6), findViewById(R.id.cover7), findViewById(R.id.cover8),
-                findViewById(R.id.cover9), findViewById(R.id.cover10), findViewById(R.id.cover11), findViewById(R.id.cover12),
-                findViewById(R.id.cover13), findViewById(R.id.cover14), findViewById(R.id.cover15), findViewById(R.id.cover16)};
+        frontCard = findViewById(R.id.top_5_card_a);
+        frontCard.setVisibility(View.VISIBLE);
         frontCard.startAnimation(WrappedHelper.animation(this, "fade in"));
-        backCard = findViewById(R.id.text_card);
+        backCard = findViewById(R.id.top_5_card_b);
         backCard.setVisibility(View.INVISIBLE);
+
         // LAYER 1: FETCH TOKEN
         FirebaseUser user = FirebaseUtils.getInstance().getFirebaseAuth().getCurrentUser();
         FirebaseUtils.fetchAccessToken(user, new FirebaseUtils.TokenFetchListener() {
@@ -57,80 +56,7 @@ public class WrappedPartThreeActivity extends AppCompatActivity {
                 Log.d("Firebase", "Access token fetched: " + token);
                 SpotifyApiHelper helper = new SpotifyApiHelper(token); // Proceed with using the token
 
-                // LAYER 2: FETCH PLAYLISTS
-                helper.getUserPlaylists(new Callback() {
-                    @Override
-                    public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                        Log.e("Spotify API", "Failed to fetch playlists", e);
-                    }
-                    @Override
-                    public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                        if (response.isSuccessful() && response.body() != null) {
-                            try {
-                                JSONObject jsonObject = new JSONObject(response.body().string());
-                                // get playlist images to populate the frontCard
-                                JSONArray playlists = jsonObject.getJSONArray("items");
-                                ArrayList<String> urls = new ArrayList<>();
-                                ArrayList<String> names = new ArrayList<>();
-                                for (int i = 0; i < playlists.length() && urls.size() < covers.length; i++) {
-                                    JSONObject playlist = playlists.getJSONObject(i);
-                                    if (!playlist.get("images").toString().equals("null")) {
-                                        JSONArray images = playlist.getJSONArray("images");
-                                        urls.add(images.getJSONObject(0).getString("url"));
-                                    } else {
-                                        /*JSONArray tracks = playlist.getJSONArray("tracks");
-                                        JSONObject firstTrack = tracks.getJSONObject(0);
-                                        JSONObject album = firstTrack.getJSONObject("album");
-                                        urls.add(album.getJSONArray("images").getJSONObject(0).getString("url"));
-                                        */
-                                        helper.getTracksFromAPlaylist(new Callback() {
-                                            @Override
-                                            public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                                                Log.e("Spotify API", "Failed to fetch playlist", e);
-                                            }
-                                            @Override
-                                            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                                                try {
-                                                    assert response.body() != null;
-                                                    JSONObject trackObject = new JSONObject(response.body().string());
-                                                    JSONArray tracks = trackObject.getJSONArray("items");
-                                                    if (tracks.length() > 0) {
-                                                        JSONObject firstTrack = tracks.getJSONObject(0).getJSONObject("track");
-                                                        JSONObject album = firstTrack.getJSONObject("album");
-                                                        urls.add(album.getJSONArray("images").getJSONObject(0).getString("url"));
-                                                    }
-                                                } catch (JSONException e) {
-                                                    e.printStackTrace();
-                                                }
-
-                                            }
-                                        }, playlist.getString("id"));
-
-                                    }
-                                    names.add(playlist.getString("name"));
-                                }
-                                Collections.shuffle(urls);
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        for (int i = 0; i < covers.length && i < urls.size(); i++) {
-                                            Picasso.get().load(urls.get(i)).into(covers[i]);
-                                        }
-                                        String backCardText = "";
-                                        for (int i = 0; i < names.size() && i < 10; i++) {
-                                            backCardText += names.get(i) + "\n";
-                                        }
-                                        backCard.setText(backCardText);
-                                    }
-                                });
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        } else {
-                            Log.e("Spotify API", "Response not successful or body is null");
-                        }
-                    }
-                });
+                // LAYER 2: FETCH GENRES
             }
 
             @Override
@@ -140,9 +66,11 @@ public class WrappedPartThreeActivity extends AppCompatActivity {
         });
 
         // Set up rest of view on arrival to page
-        title = findViewById(R.id.title_text);
-        buttonBack = findViewById(R.id.back_button);
-        buttonNext = findViewById(R.id.continue_button);
+        TextView title = findViewById(R.id.title_text);
+        title.setText("What you've been waiting for...\nYour top artists and songs!");
+        Button buttonBack = findViewById(R.id.back_button);
+        Button buttonNext = findViewById(R.id.continue_button);
+        title.startAnimation(WrappedHelper.animation(this, "fade in"));
         buttonNext.startAnimation(WrappedHelper.animation(this, "fade in"));
         buttonBack.startAnimation(WrappedHelper.animation(this, "fade in"));
 

@@ -34,10 +34,10 @@ public class WrappedEndScreenActivity extends AppCompatActivity {
         backCard.startAnimation(WrappedHelper.animation(this, "fade in"));
 
         gamePrompt.setVisibility(View.VISIBLE);
-        gamePrompt.startAnimation(WrappedHelper.animation(this, "fly in bottom"));
-        Animation floatWithOffset = WrappedHelper.animation(this, "float");
-        floatWithOffset.setStartOffset(1000);
-        gamePrompt.startAnimation(floatWithOffset);
+        Animation flyInBottom = WrappedHelper.animation(this, "fly in bottom");
+        gamePrompt.startAnimation(flyInBottom);
+        Animation floatVertical = WrappedHelper.animation(this, "float");
+        // gamePrompt.startAnimation(floatVertical);
         Animation fadeInWithOffset = WrappedHelper.animation(this, "fade in");
         fadeInWithOffset.setStartOffset(3000);
         buttonContinue.startAnimation(fadeInWithOffset);
