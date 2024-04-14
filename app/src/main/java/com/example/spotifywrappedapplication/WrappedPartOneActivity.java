@@ -30,7 +30,7 @@ import okhttp3.Callback;
 import okhttp3.Response;
 
 public class WrappedPartOneActivity extends AppCompatActivity {
-    private TextView title;
+    private TextView title, tapPrompt;
     private Button buttonNext;
     private Button buttonBack;
     private GridLayout frontCard;
@@ -143,8 +143,14 @@ public class WrappedPartOneActivity extends AppCompatActivity {
 
         // Set up rest of view on arrival to page
         title = findViewById(R.id.title_text);
+        tapPrompt = findViewById(R.id.tap_prompt);
         buttonBack = findViewById(R.id.back_button);
         buttonNext = findViewById(R.id.continue_button);
+        title.startAnimation(WrappedHelper.animation(this, "fade in"));
+        Animation fadeInSlow = WrappedHelper.animation(this, "fade in");
+        fadeInSlow.setDuration(5000);
+        tapPrompt.startAnimation(fadeInSlow);
+        frontCard.startAnimation(fadeInSlow);
         buttonNext.startAnimation(WrappedHelper.animation(this, "fade in"));
         buttonBack.startAnimation(WrappedHelper.animation(this, "fade in"));
 

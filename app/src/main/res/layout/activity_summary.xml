@@ -45,7 +45,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/sen_bold"
-        android:text="@string/title_text"
+        android:text="@string/part_one_text"
         android:textAlignment="center"
         android:textColor="#FDFDFD"
         android:textSize="25sp"
@@ -55,6 +55,22 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.5" />
+
+
+    <TextView
+        android:id="@+id/tap_prompt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:fontFamily="@font/sen_bold"
+        android:text="@string/tap_prompt_text"
+        android:textAlignment="center"
+        android:textColor="#FDFDFD"
+        android:textSize="12sp"
+        android:textStyle="italic"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/title_text" />
 
     <GridLayout
         android:id="@+id/grid_image_card"
