@@ -4,8 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ImageView;
@@ -29,7 +27,7 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
-public class WrappedPartOneActivity extends AppCompatActivity {
+public class WrappedPartTwoActivity extends AppCompatActivity {
     private TextView title;
     private Button buttonNext;
     private Button buttonBack;
@@ -151,11 +149,11 @@ public class WrappedPartOneActivity extends AppCompatActivity {
 
         // Set the click listeners for the buttons & gesture detector
         buttonBack.setOnClickListener((v) -> {
-            returnToMain();
+            returnToPartOne();
         });
 
         buttonNext.setOnClickListener((v) -> {
-            continueToPartTwo();
+            continueToGame();
         });
 
         frontCard.setOnClickListener((v) -> {
@@ -170,16 +168,16 @@ public class WrappedPartOneActivity extends AppCompatActivity {
     /**
      * Return to the main page
      */
-    public void returnToMain() {
-        Intent intent = new Intent(WrappedPartOneActivity.this, MainActivity.class);
+    protected void returnToPartOne() {
+        Intent intent = new Intent(WrappedPartTwoActivity.this, WrappedPartOneActivity.class);
         startActivity(intent);
     }
 
     /**
      * Continue onwards in the Wrapped Summary
      */
-    public void continueToPartTwo() {
-        Intent intent = new Intent(WrappedPartOneActivity.this, WrappedPartTwoActivity.class);
+    protected void continueToGame() {
+        Intent intent = new Intent(WrappedPartTwoActivity.this, WrappedPartThreeActivity.class);
         intent.putExtra("ACCESS_TOKEN", getIntent().getStringExtra("ACCESS_TOKEN"));
         startActivity(intent);
     }

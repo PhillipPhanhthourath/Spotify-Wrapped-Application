@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">Spotify Wrapped Application</string>
-    <string name="log_in_to_spotify">Log In To Spotify</string>
-    <string name="generate_summary">Generate Summary</string>
-    <string name="spotify_wrapped">Spotify Wrapped</string>
+    <string name="log_in">Log In</string>
+    <string name="generate_summary">New Summary</string>
+    <string name="spotify_wrapped">Spotify\nWrapped</string>
     <string name="request_code">Request Code</string>
 
     <string name="title_user_profile">Profile</string>
@@ -12,7 +12,15 @@
     <string name="welcome">Welcome\nto\nYour Wrapped</string>
     <string name="back">Back</string>
     <string name="game">Game</string>
-    <string name="part_one_text">Your Top Playlists</string>
+    <string name="title_text">Your Top Playlists</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="random_text">Random Text\nPlaylist Names\nMore Names</string>
+    <string name="next">Next</string>
+    <string name="save_credentials">Save Credentials</string>
+    <string name="already_user">Already a user? Slide up to view your past summaries.</string>
+    <string name="end_screen_text">Hope you enjoyed!\nTap on the image to download your full summary.</string>
+    <string name="game_prompt">Want to play a game?</string>
+    <string name="sure">Sure!</string>
+    <string name="no">No, I\'m Good</string>
+    <string name="maybe_later">Maybe Later</string>
 </resources>

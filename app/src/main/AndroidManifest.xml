@@ -16,11 +16,17 @@
             android:name=".GameNavActivity"
             android:exported="false" />
         <activity
-            android:name=".WelcomeScreenActivity"
+            android:name=".WrappedWelcomeScreenActivity"
             android:exported="false" />
         <activity
             android:name=".WrappedPartOneActivity"
             android:exported="false" />
+        <activity android:name=".WrappedPartTwoActivity"
+            android:exported="false" />
+        <activity android:name=".WrappedPartThreeActivity"
+            android:exported="false" />
+        <activity android:name=".WrappedEndScreenActivity"
+            android:exported="false"/>
         <activity
             android:name=".MainActivity"
             android:exported="true">

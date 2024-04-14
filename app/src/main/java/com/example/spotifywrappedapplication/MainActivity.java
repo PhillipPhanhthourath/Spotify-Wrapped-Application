@@ -1,44 +1,31 @@
 package com.example.spotifywrappedapplication;
-import androidx.lifecycle.ViewModelProvider;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.database.ValueEventListener;
 import com.spotify.sdk.android.auth.AuthorizationClient;
 import com.spotify.sdk.android.auth.AuthorizationRequest;
 import com.spotify.sdk.android.auth.AuthorizationResponse;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
@@ -51,23 +38,22 @@ public class MainActivity extends AppCompatActivity {
     public static final int AUTH_TOKEN_REQUEST_CODE = 0;
     public static final int AUTH_CODE_REQUEST_CODE = 1;
 
-    private final OkHttpClient mOkHttpClient = new OkHttpClient();
-    private String mAccessToken, mAccessCode;
+    private String mAccessToken;
+    private String mAccessCode;
     private Call mCall;
-
-    private TextView profileTextView;
-    // private TextView tokenTextView, codeTextView, profileTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        /* Initialize the views
-        tokenTextView = (TextView) findViewById(R.id.token_text_view);
-        codeTextView = (TextView) findViewById(R.id.code_text_view);
-        */
-        profileTextView = (TextView) findViewById(R.id.response_text_view);
+        // Initialize text
+        TextView title = findViewById(R.id.spotify_wrapped_text_view);
+        System.out.println(title.toString());
+        TextView pastSummaries = findViewById(R.id.past_summaries);
+        System.out.println(pastSummaries.toString());
+        pastSummaries.setVisibility(View.VISIBLE);
+        pastSummaries.startAnimation(WrappedHelper.animation(this, "fly in bottom"));
 
         // Initialize the buttons
         Button loginBtn = (Button) findViewById(R.id.spotify_login_btn);
@@ -155,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /*
-    Responsiblity: ensure that the token is valid, if it is not, then request the token again
+    Responsibility: ensure that the token is valid, if it is not, then request the token again
      */
     private void handleToken(String token) {
         SpotifyApiHelper helper = new SpotifyApiHelper(token);
@@ -201,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
      * When the app leaves this activity to momentarily get a token/code, this function
      * fetches the result of that external activity to get the response from Spotify
      *
-     * In our case - this block of code will run once a response is recieved from the spotify API
+     * In our case - this block of code will run once a response is received from the spotify API
      *
      * Will save the spotify login info to the users database
      *
@@ -241,7 +227,6 @@ public class MainActivity extends AppCompatActivity {
 
         } else if (AUTH_CODE_REQUEST_CODE == requestCode) {
             mAccessCode = response.getCode();
-            // setTextAsync("Code: " + mAccessCode, codeTextView);
         }
     }
 
@@ -254,7 +239,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "You need to Login to Spotify first!", Toast.LENGTH_SHORT).show();
             return;
         }
-        Intent intent = new Intent(MainActivity.this, WelcomeScreenActivity.class);
+        Intent intent = new Intent(MainActivity.this, WrappedWelcomeScreenActivity.class);
         intent.putExtra("ACCESS_TOKEN", mAccessToken);
         startActivity(intent);
     }

@@ -11,70 +11,55 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_gravity="center_vertical">
 
         <TextView
             android:id="@+id/spotify_wrapped_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_margin="10dp"
             android:fontFamily="@font/sen_bold"
+            android:gravity="center"
+            android:letterSpacing="-0.1"
+            android:lineSpacingMultiplier="0.75"
             android:text="@string/spotify_wrapped"
             android:textColor="#FDFDFD"
-            android:textSize="45sp"
+            android:textSize="100sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@id/spotify_login_btn"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.488"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <Button
             android:id="@+id/spotify_login_btn"
-            android:layout_width="257dp"
-            android:layout_height="116dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="112dp"
-            android:layout_marginEnd="16dp"
+            android:layout_width="254dp"
+            android:layout_height="90dp"
+            android:layout_marginTop="64dp"
             android:background="@drawable/rounded_button"
             android:backgroundTint="#1A8D43"
             android:fontFamily="@font/sen_bold"
             android:padding="30dp"
-            android:text="@string/log_in_to_spotify"
+            android:text="@string/log_in"
             android:textColor="#FAFAFA"
             android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.491"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/spotify_wrapped_text_view" />
 
         <Button
-            android:visibility="invisible"
             android:id="@+id/code_btn"
-            android:layout_width="206dp"
-            android:layout_height="47dp"
-            android:layout_marginTop="32dp"
-            android:text="Save Credentials"
+            android:layout_width="254dp"
+            android:layout_height="90dp"
+            android:layout_marginTop="64dp"
+            android:text="@string/save_credentials"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="@id/spotify_login_btn"
-            app:layout_constraintHorizontal_bias="0.444"
             app:layout_constraintStart_toStartOf="@id/spotify_login_btn"
             app:layout_constraintTop_toBottomOf="@id/spotify_login_btn"
             app:layout_constraintVertical_bias="0.164" />
-
-        <TextView
-            android:id="@+id/response_text_view"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:textSize="20sp"
-
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/generate_summary_btn"
-            tools:text=""
-            />
 
         <Button
             android:id="@+id/generate_summary_btn"
@@ -88,12 +73,25 @@
             android:text="@string/generate_summary"
             android:textColor="#FAFAFA"
             android:textSize="20sp"
-
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.484"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/code_btn" />
+
+        <TextView
+            android:id="@+id/past_summaries"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="100dp"
+            android:fontFamily="@font/sen_bold"
+            android:text="@string/already_user"
+            android:textColor="@color/black"
+            android:textSize="15sp"
+            android:textStyle="italic"
+            android:visibility="invisible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/generate_summary_btn" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>
