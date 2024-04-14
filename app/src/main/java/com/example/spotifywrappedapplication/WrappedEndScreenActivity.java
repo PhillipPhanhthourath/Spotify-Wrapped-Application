@@ -10,28 +10,24 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class WrappedEndScreenActivity extends AppCompatActivity {
-    private TextView title;
     private View frontCard;
     private View backCard;
-    private TextView gamePrompt;
-    private Button buttonContinue;
-    private Button buttonBack;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_end_of_wrapped);
 
         // view on arrival to page
-        title = findViewById(R.id.title_text);
-        buttonBack = findViewById(R.id.back_button);
-        buttonContinue = findViewById(R.id.continue_button);
+        TextView title = findViewById(R.id.title_text);
+        Button buttonBack = findViewById(R.id.back_button);
+        Button buttonContinue = findViewById(R.id.continue_button);
         frontCard = findViewById(R.id.summary_image);
-        backCard = findViewById(R.id.text_card);
-        gamePrompt = findViewById(R.id.game_prompt);
+        TextView gamePrompt = findViewById(R.id.game_prompt);
 
         title.startAnimation(WrappedHelper.animation(this, "fade in"));
         frontCard.startAnimation(WrappedHelper.animation(this, "fade in"));
-        backCard.startAnimation(WrappedHelper.animation(this, "fade in"));
+        // backCard.startAnimation(WrappedHelper.animation(this, "fade in"));
 
         gamePrompt.setVisibility(View.VISIBLE);
         Animation flyInBottom = WrappedHelper.animation(this, "fly in bottom");
@@ -53,13 +49,13 @@ public class WrappedEndScreenActivity extends AppCompatActivity {
             continueToGame();
         });
 
-        frontCard.setOnClickListener((v) -> {
+        /*frontCard.setOnClickListener((v) -> {
             WrappedHelper.flipCard(this, frontCard, backCard);
         });
 
-        backCard.setOnClickListener((v) -> {
+        /* backCard.setOnClickListener((v) -> {
             WrappedHelper.flipCard(this, frontCard, backCard);
-        });
+        });*/
     }
 
     /**
