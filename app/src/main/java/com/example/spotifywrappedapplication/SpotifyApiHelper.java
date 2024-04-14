@@ -150,6 +150,16 @@ public class SpotifyApiHelper {
         client.newCall(request).enqueue(callback);
     }
 
+    public void getTracksFromAPlaylist(Callback callback, String playlistId) {
+        String url = "https://api.spotify.com/v1/playlists/" + playlistId + "/tracks";
+        Request request = new Request.Builder()
+                .url(url)
+                .header("Authorization", "Bearer " + accessToken)
+                .build();
+
+        client.newCall(request).enqueue(callback);
+    }
+
     // All the tracks from all the users playlists
     // Returns a list of json files, each jsonfile is a playlist
     public void getTracksFromAllPlaylists(Callback finalCallback) {

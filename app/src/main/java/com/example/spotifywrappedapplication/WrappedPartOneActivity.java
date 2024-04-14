@@ -35,6 +35,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -113,13 +114,42 @@ public class WrappedPartOneActivity extends AppCompatActivity {
                                 ArrayList<String> names = new ArrayList<>();
                                 for (int i = 0; i < playlists.length() && urls.size() < covers.length; i++) {
                                     JSONObject playlist = playlists.getJSONObject(i);
-                                    System.out.println(playlist.get("images"));
                                     if (!playlist.get("images").toString().equals("null")) {
                                         JSONArray images = playlist.getJSONArray("images");
                                         urls.add(images.getJSONObject(0).getString("url"));
+                                    } else {
+                                        /*JSONArray tracks = playlist.getJSONArray("tracks");
+                                        JSONObject firstTrack = tracks.getJSONObject(0);
+                                        JSONObject album = firstTrack.getJSONObject("album");
+                                        urls.add(album.getJSONArray("images").getJSONObject(0).getString("url"));
+                                        */
+                                        helper.getTracksFromAPlaylist(new Callback() {
+                                            @Override
+                                            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                                                Log.e("Spotify API", "Failed to fetch playlist", e);
+                                            }
+                                            @Override
+                                            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                                                try {
+                                                    assert response.body() != null;
+                                                    JSONObject trackObject = new JSONObject(response.body().string());
+                                                    JSONArray tracks = trackObject.getJSONArray("items");
+                                                    if (tracks.length() > 0) {
+                                                        JSONObject firstTrack = tracks.getJSONObject(0).getJSONObject("track");
+                                                        JSONObject album = firstTrack.getJSONObject("album");
+                                                        urls.add(album.getJSONArray("images").getJSONObject(0).getString("url"));
+                                                    }
+                                                } catch (JSONException e) {
+                                                    e.printStackTrace();
+                                                }
+
+                                            }
+                                        }, playlist.getString("id"));
+
                                     }
                                     names.add(playlist.getString("name"));
                                 }
+                                Collections.shuffle(urls);
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
