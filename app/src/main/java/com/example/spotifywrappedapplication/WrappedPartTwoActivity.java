@@ -26,7 +26,7 @@ public class WrappedPartTwoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_summary);
 
         // Set up frontCard and backCard
-        frontCard = findViewById(R.id.word_cloud);
+        frontCard = findViewById(R.id.grid_image_card);
         frontCard.setVisibility(View.VISIBLE);
         frontCard.startAnimation(WrappedHelper.animation(this, "fade in"));
         backCard = findViewById(R.id.bar_graph);
