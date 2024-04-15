@@ -71,7 +71,7 @@ public class GameNavActivity extends AppCompatActivity implements PlaceholderAda
                 public void onTokenFetched(String token) {
                     Log.d("Firebase", "Access token fetched today: " + token);
                     SpotifyApiHelper helper = new SpotifyApiHelper(token); // Proceed with using the token
-                    testUtils(helper);
+                    // testUtils(helper);
 
                     // LAYER 2: FETCH PLAYLISTS
                     helper.getTracksFromAllPlaylists(jsonResponse -> {
@@ -137,24 +137,6 @@ public class GameNavActivity extends AppCompatActivity implements PlaceholderAda
         });
     }
 
-    public void testUtils(SpotifyApiHelper helper){
-
-        helper.playlistUtil(playlists -> {
-
-            List<String> playlistnames = new ArrayList<>(playlists.keySet());
-            for (String playlist : playlistnames){
-                System.out.println("the name of the playlist:");
-                System.out.println(playlist);
-                System.out.println("the songs in the playlist:");
-                System.out.println(playlists.get(playlist).getSongs());
-                System.out.println("the top 5 artists in the playlist");
-                System.out.println(playlists.get(playlist).top5Artists());
-                System.out.println("the top 5 most frequently listened to songs");
-                System.out.println(playlists.get(playlist).top5SongsFreq());
-            }
-
-        });
-    }
 
     // Hides all existing elements of the game activity page
     @Override

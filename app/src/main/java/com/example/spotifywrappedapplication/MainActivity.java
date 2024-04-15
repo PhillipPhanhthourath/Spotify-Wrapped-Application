@@ -25,6 +25,8 @@ import com.spotify.sdk.android.auth.AuthorizationRequest;
 import com.spotify.sdk.android.auth.AuthorizationResponse;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -73,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         generateSummaryBtn.setOnClickListener((v) -> {
+            testUtils(new SpotifyApiHelper(mAccessToken));
             onGetUserProfileClicked();
         });
 
@@ -267,7 +270,7 @@ public class MainActivity extends AppCompatActivity {
     private AuthorizationRequest getAuthenticationRequest(AuthorizationResponse.Type type) {
         return new AuthorizationRequest.Builder(CLIENT_ID, type, getRedirectUri().toString())
                 .setShowDialog(false)
-                .setScopes(new String[]{"user-read-email"}) // <--- Change the scope of your requested token here
+                .setScopes(new String[]{"user-read-email", "user-top-read"}) // <--- Change the scope of your requested token here
                 .setCampaign("your-campaign-token")
                 .build();
     }
@@ -291,6 +294,34 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         cancelCall();
         super.onDestroy();
+    }
+
+    public void testUtils(SpotifyApiHelper helper){
+
+        System.out.println("Calling test utils method from MainActivity.java");
+        helper.playlistUtil(playlists -> {
+            List<String> playlistnames = new ArrayList<>(playlists.keySet());
+            for (String playlist : playlistnames){
+                System.out.println("the name of the playlist:");
+                System.out.println(playlist);
+                System.out.println("the songs in the playlist:");
+                System.out.println(playlists.get(playlist).getSongs());
+                System.out.println("the top 5 artists in the playlist");
+                List<PlaylistSongs.Artist> artists = playlists.get(playlist).top5Artists();
+                PlaylistSongs.Artist artist = artists.get(0);
+                String artistID = artist.getId();
+                helper.getArtistFromID((a) -> {
+                    // implement "execute" method
+                    JsonNameFinder.printFormattedJson(a);
+                }, artistID);
+                System.out.println(playlists.get(playlist).top5Artists());
+                System.out.println("the top 5 most frequently listened to songs");
+                System.out.println(playlists.get(playlist).top5SongsFreq());
+            }
+
+        });
+
+
     }
 
     public class SlideUpGestureDetector implements View.OnTouchListener {

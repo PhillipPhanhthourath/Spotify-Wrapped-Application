@@ -62,7 +62,6 @@ class PlaylistSongs {
     public static void setTopItems(JSONObject topItemsInp) {
         // Initialize the songs list
         PlaylistSongs.topItems = new PlaylistSongs(topItemsInp);
-
     }
 
     public List<Song> getSongs() {
@@ -616,6 +615,7 @@ public class SpotifyApiHelper {
         System.out.println("inside playlistUtil");
 // Fetch the user's top tracks over the medium term
         spotifyHelper.getUserTopTracks(topsongsstr -> {
+            System.out.println("inside getUserTopTracks");
             PlaylistSongs.setTopItems(new JSONObject(topsongsstr));
             spotifyHelper.getTracksFromAllPlaylists(allplaylistsstr -> {
                 //now, we have the top songs, and info from all playlists
