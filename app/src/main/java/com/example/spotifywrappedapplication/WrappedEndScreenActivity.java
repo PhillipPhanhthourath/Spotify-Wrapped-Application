@@ -92,7 +92,7 @@ public class WrappedEndScreenActivity extends AppCompatActivity {
         FileOutputStream outputStream;
         try {
             outputStream = this.openFileOutput(filename, Context.MODE_PRIVATE);
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
             outputStream.close();
             Toast.makeText(this, "Successfully downloaded!", Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
