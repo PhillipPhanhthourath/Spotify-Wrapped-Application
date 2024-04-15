@@ -17,7 +17,7 @@ import com.google.firebase.auth.FirebaseUser;
 import org.json.JSONObject;
 
 public class WrappedPartTwoActivity extends AppCompatActivity {
-    private WebView frontCard;
+    private View frontCard;
     private LinearLayout backCard;
 
     @Override
