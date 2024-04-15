@@ -16,7 +16,7 @@ public class SelectPlaylistDialog extends Dialog {
         void onWordSearchCreated(FragmentData newData);
     }
 
-    public SelectPlaylistDialog(Context context, HashMap<String,List<String>> songOptions, DialogListener listener) {
+    public SelectPlaylistDialog(Context context, HashMap<String,List<String>> songOptions, HashMap<String,String> urls, DialogListener listener) {
         super(context);
         setContentView(R.layout.dialog_playlist_difficulty);
 
@@ -39,11 +39,11 @@ public class SelectPlaylistDialog extends Dialog {
         buttonCreate.setOnClickListener(v -> {
             int selectedDifficulty = Integer.parseInt(spinnerDifficulty.getSelectedItem().toString());
             String selectedPlaylist = spinnerPlaylists.getSelectedItem().toString();
+            String imageUrl = urls.get(selectedPlaylist);
             List<String> words = songOptions.get(selectedPlaylist);  // Assuming songOptions map from playlist name to list of words
 
             WordSearchGenerator wordSearch = new WordSearchGenerator(words, selectedDifficulty, 10, 10);
-            FragmentData newData = new FragmentData("#FFFFFF", selectedPlaylist, wordSearch);  // Assuming default color is white
-
+            FragmentData newData = new FragmentData("#FFFFFF", selectedPlaylist, imageUrl, wordSearch);  // Assuming default color is white
             listener.onWordSearchCreated(newData);
             dismiss();
         });

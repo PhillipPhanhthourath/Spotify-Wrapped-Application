@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseUser;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -43,6 +44,7 @@ public class GameNavActivity extends AppCompatActivity implements PlaceholderAda
     private RecyclerView recyclerView;
     private SharedViewModel viewModel;
     private PlaceholderAdapter adapter;
+    private ArrayList<FragmentData> fdata;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,10 +54,12 @@ public class GameNavActivity extends AppCompatActivity implements PlaceholderAda
         // Initialize the ViewModel
         viewModel = new ViewModelProvider(this).get(SharedViewModel.class);
 
-
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new PlaceholderAdapter(new ArrayList<FragmentData>(), this);
+        if (fdata==null){ //retrieve saved data
+            fdata = new ArrayList<FragmentData>();
+        }
+        adapter = new PlaceholderAdapter(fdata, this);
         recyclerView.setAdapter(adapter);
         Button openAlertButton = findViewById(R.id.openAlertButton);
         openAlertButton.setOnClickListener(view -> {
@@ -65,63 +69,55 @@ public class GameNavActivity extends AppCompatActivity implements PlaceholderAda
             FirebaseUtils.fetchAccessToken(user, new FirebaseUtils.TokenFetchListener() {
                 @Override
                 public void onTokenFetched(String token) {
-                    Log.d("Firebase", "Access token fetched: " + token);
+                    Log.d("Firebase", "Access token fetched today: " + token);
                     SpotifyApiHelper helper = new SpotifyApiHelper(token); // Proceed with using the token
+                    testUtils(helper);
 
                     // LAYER 2: FETCH PLAYLISTS
-                    helper.getTracksFromAllPlaylists(new Callback() {
-                        @Override
-                        public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                            Log.e("Spotify API", "Failed to fetch playlists", e);
-                        }
-                        @Override
-                        public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                            if (response.isSuccessful() && response.body() != null) {
-                                String jsonResponse = response.body().string();
-                                JsonNameFinder finder = new JsonNameFinder();
-                                List<String> allsongs = finder.findNames(jsonResponse);
-                                for (String key : allsongs) {
-                                    System.out.println(key);
+                    helper.getTracksFromAllPlaylists(jsonResponse -> {
+                        JsonNameFinder finder = new JsonNameFinder();
+                        try {
+                            // Parse the string into a JSONArray
+                            JSONArray jsonArray = new JSONArray(jsonResponse);
+                            JSONObject jsonObject = jsonArray.getJSONObject(0);
+                            JSONArray playlists = jsonObject.getJSONArray("items");
+                            List<String> playlistNames = finder.findNames(jsonObject.toString());
+                            HashMap<String,List<String>> songOptions = new HashMap<>();
+                            HashMap<String,String> urls = new HashMap<>();
+                            for (int i = 0; i < playlists.length(); ++i){
+                                JSONObject playlist = playlists.getJSONObject(i);
+                                String playlistname = playlist.getString("name");
+                                List<String> value = finder.findNames(jsonArray.getJSONObject(i+1).toString());
+                                songOptions.put(playlistname,value);
+                                if (!playlist.get("images").toString().equals("null")) {
+                                    JSONArray images = playlist.getJSONArray("images");
+                                    urls.put(playlistname,images.getJSONObject(0).getString("url"));
                                 }
-                                try {
-                                    // Parse the string into a JSONArray
-                                    JSONArray jsonArray = new JSONArray(jsonResponse);
-                                    List<String> names = finder.findNames(jsonArray.getJSONObject(0).toString());
-                                    HashMap<String,List<String>> songOptions = new HashMap<>();
-                                    for (int i = 1; i <= names.size(); ++i){
-                                        String key = names.get(i-1);
-                                        List<String> value = finder.findNames(jsonArray.getJSONObject(i).toString());
-                                        System.out.println(key);
-                                        System.out.println(value);
-                                        songOptions.put(key,value);
-                                    }
-                                    //Map<String,List<String>> songOptions: holds the song options
-                                    //int difficulty: [1,3] difficulty of the game
-                                    //int rows: fixed to 10
-                                    //int cols: fixed to 10
-                                    //public WordSearchGenerator(List<String> words, int difficulty, int rows, int cols)
-                                    //public FragmentData(String color, WordSearchGenerator wordSearch)
-                                    //adapter.updateData(FragmentData newData)
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            // Code to show dialog goes here
-                                            SelectPlaylistDialog dialog = new SelectPlaylistDialog(GameNavActivity.this, songOptions, newData -> {
-                                                adapter.updateData(newData);
-                                            });
-                                            dialog.show();
-                                        }
-                                    });
-
-
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            } else {
-                                Log.e("Spotify API", "Response not successful or body is null");
                             }
-                        }
-                    });
+
+                            //Map<String,List<String>> songOptions: holds the song options
+                            //int difficulty: [1,3] difficulty of the game
+                            //int rows: fixed to 10
+                            //int cols: fixed to 10
+                            //public WordSearchGenerator(List<String> words, int difficulty, int rows, int cols)
+                            //public FragmentData(String color, WordSearchGenerator wordSearch)
+                            //adapter.updateData(FragmentData newData)
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    // Code to show dialog goes here
+                                    SelectPlaylistDialog dialog = new SelectPlaylistDialog(GameNavActivity.this, songOptions, urls, newData -> {
+                                        adapter.updateData(newData);
+                                    });
+                                    System.out.println("showing dialog");
+                                    dialog.show();
+                                }
+                            });
+
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }});
                 }
 
                 @Override
@@ -138,6 +134,25 @@ public class GameNavActivity extends AppCompatActivity implements PlaceholderAda
                 // This might involve finishing the current activity or navigating with a NavController
                 finish();  // For example, if this button is meant to close the current activity
             }
+        });
+    }
+
+    public void testUtils(SpotifyApiHelper helper){
+
+        helper.playlistUtil(playlists -> {
+
+            List<String> playlistnames = new ArrayList<>(playlists.keySet());
+            for (String playlist : playlistnames){
+                System.out.println("the name of the playlist:");
+                System.out.println(playlist);
+                System.out.println("the songs in the playlist:");
+                System.out.println(playlists.get(playlist).getSongs());
+                System.out.println("the top 5 artists in the playlist");
+                System.out.println(playlists.get(playlist).top5Artists());
+                System.out.println("the top 5 most frequently listened to songs");
+                System.out.println(playlists.get(playlist).top5SongsFreq());
+            }
+
         });
     }
 

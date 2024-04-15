@@ -1,5 +1,8 @@
 package com.example.spotifywrappedapplication;
+
 import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,7 +26,215 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+import java.util.stream.Collectors;
 
+class PlaylistSongs {
+    private static PlaylistSongs topItems;
+    private List<Song> songs;
+
+    public PlaylistSongs(JSONObject tracks) {
+        // Initialize the songs list
+        this.songs = new ArrayList<>();
+
+        try {
+            // Parse the JSON object to extract the array of items
+            JSONArray itemsArray = tracks.getJSONArray("items");
+
+            // Iterate through each item in the array
+            for (int i = 0; i < itemsArray.length(); i++) {
+                JSONObject item = itemsArray.getJSONObject(i);
+                JSONObject track = item.getJSONObject("track");
+                // Create a new Song object with the track JSON object
+                Song song = this.createSong(track);
+                System.out.println(song);
+                this.songs.add(song);
+            }
+        } catch (JSONException e) {
+            // Handle possible JSON exceptions
+            System.err.println("Failed to parse JSON: " + e.getMessage());
+        }
+    }
+
+    public static PlaylistSongs getTopItems() {
+        return topItems;
+    }
+
+    public static void setTopItems(JSONObject topItemsInp) {
+        // Initialize the songs list
+        PlaylistSongs.topItems = new PlaylistSongs(topItemsInp);
+
+    }
+
+    public List<Song> getSongs() {
+        return songs;
+    }
+
+    public void setSongs(List<Song> songs) {
+        this.songs = songs;
+    }
+
+    public List<Song> top5SongsFreq() {
+        // Map to count frequency of each song
+        Map<Song, Integer> songFrequency = new HashMap<>();
+        for (Song song : songs) {
+            songFrequency.put(song, songFrequency.getOrDefault(song, 0) + 1);
+        }
+
+        // Stream and sort songs by frequency in descending order and limit to 5
+        return songs.stream()
+                .distinct() // Ensure we're operating on unique songs
+                .sorted((song1, song2) -> Integer.compare(songFrequency.get(song2), songFrequency.get(song1)))
+                .limit(5)
+                .collect(Collectors.toList());
+    }
+    public List<PlaylistSongs.Artist> top5Artists() {
+        return songs.stream()
+                .map(Song::getArtist)
+                .distinct()
+                .sorted((a1, a2) -> Integer.compare(a2.getSongCount(), a1.getSongCount()))
+                .limit(5)
+                .collect(Collectors.toList());
+    }
+    public Song createSong (JSONObject track) {
+        try {
+            String name = track.getString("name");
+            int popularity = track.getInt("popularity");
+            String urlToImage = track.getJSONObject("album").getJSONArray("images").getJSONObject(0).getString("url");
+
+            // Assuming only one artist per song for simplicity
+            JSONObject artistJson = track.getJSONArray("artists").getJSONObject(0);
+            Artist artist = this.createArtist(artistJson);
+            return new Song(name, artist, popularity, urlToImage);
+        } catch (JSONException e) {
+            System.err.println("Failed to parse song JSON: " + e.getMessage());
+        }
+        System.out.println("FAILED BIG");
+        return null;
+    }
+
+    class Song {
+        private String name;
+        private Artist artist;
+        private int popularity;
+        private String dateAdded;
+        private String urlToImage;
+
+        @Override
+        public String toString() {
+            return "Song{" +
+                    "name='" + name + '\'' +
+                    ", artist=" + artist +
+                    ", popularity=" + popularity +
+                    ", dateAdded='" + dateAdded + '\'' +
+                    ", urlToImage='" + urlToImage + '\'' +
+                    '}';
+        }
+
+        private Song (String name, Artist artist, int popularity, String urlToImage) {
+            this.name=name;
+            this.artist=artist;
+            this.popularity=popularity;
+            this.urlToImage=urlToImage;
+        }
+
+        // Getters and Setters
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public Artist getArtist() {
+            return artist;
+        }
+
+        public void setArtist(Artist artist) {
+            this.artist = artist;
+        }
+
+        public int getPopularity() {
+            return popularity;
+        }
+
+        public void setPopularity(int popularity) {
+            this.popularity = popularity;
+        }
+
+        public String getDateAdded() {
+            return dateAdded;
+        }
+
+        public void setDateAdded(String dateAdded) {
+            this.dateAdded = dateAdded;
+        }
+
+        public String getUrlToImage() {
+            return urlToImage;
+        }
+
+        public void setUrlToImage(String urlToImage) {
+            this.urlToImage = urlToImage;
+        }
+    }
+    // Factory method to manage artist instances
+    private Map<String, Artist> artistRegistry = new HashMap<>();
+    public Artist createArtist(JSONObject artistJson) throws JSONException {
+        String id = artistJson.getString("id");
+        String name = artistJson.getString("name");
+        if (artistRegistry.containsKey(id)) {
+            Artist existingArtist = artistRegistry.get(id);
+            existingArtist.incrementSongCount();
+            return existingArtist;
+        } else {
+            Artist newArtist = new PlaylistSongs.Artist(name, id);
+            artistRegistry.put(id, newArtist);
+            return newArtist;
+        }
+    }
+    class Artist {
+        private String name;
+        private String id;
+        private int songCount; // Instance variable for song count
+
+        // Private constructor to prevent direct instantiation
+        private Artist(String name, String id) {
+            this.name = name;
+            this.id = id;
+            this.songCount = 1; // Initialize with 1 song
+        }
+
+        private void incrementSongCount() {
+            this.songCount++;
+        }
+
+        public int getSongCount() {
+            return songCount;
+        }
+
+        public void setSongCount(int songCount) {
+            this.songCount = songCount;
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        @Override
+        public String toString() {
+            return "Artist{" +
+                    "name='" + name + '\'' +
+                    ", id='" + id + '\'' +
+                    ", songCount=" + songCount +
+                    '}';
+        }
+    }
+}
 class JsonNameFinder {
 
     public static void printFormattedJson(String json) {
@@ -149,10 +360,107 @@ public class SpotifyApiHelper {
 
         client.newCall(request).enqueue(callback);
     }
+    public interface StringFunction {
+        void execute(String data) throws JSONException;
+    }
+
+    public void getUserTopTracks(StringFunction responseExe, String timeRange) {
+        Callback responseCallback = new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                // Handle the failure case
+                System.out.println("getUserTopTracks failed");
+                e.printStackTrace();
+            }
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (!response.isSuccessful()) {
+                    throw new IOException("Unexpected code " + response);
+                } else {
+                    // Here you can handle the JSON response
+                    String responseData = response.body().string();
+                    try {
+                        responseExe.execute(responseData);
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                    // Further processing of the data, e.g., parsing JSON and extracting data
+                }
+            }
+        };
+        // Construct the URL with a time range query parameter
+        String url = "https://api.spotify.com/v1/me/top/tracks?time_range=" + timeRange;
+        // Build the request with the necessary authorization header and the URL
+        Request request = new Request.Builder()
+                .url(url)
+                .header("Authorization", "Bearer " + accessToken)
+                .build();
+        
+        
+        // Enqueue the request with the callback to handle the response
+        client.newCall(request).enqueue(responseCallback);
+    }
+
+    public void getArtistFromID(StringFunction responseExe, String artistId) {
+        // Construct the URL using the artist ID
+        String url = "https://api.spotify.com/v1/artists/" + artistId;
+
+        // Build the request with the necessary authorization header and the URL
+        Request request = new Request.Builder()
+                .url(url)
+                .header("Authorization", "Bearer " + accessToken)
+                .build();
+
+        // Enqueue the request with the callback to handle the response
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                // Handle the failure case
+                System.out.println("getArtist failed");
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (!response.isSuccessful()) {
+                    throw new IOException("Unexpected code " + response);
+                } else {
+                    // Here you can handle the JSON response
+                    String responseData = response.body().string();
+                    try {
+                        responseExe.execute(responseData);
+                    } catch (JSONException e) {
+                        throw new RuntimeException("Failed to parse JSON", e);
+                    }
+                    // Further processing of the data, e.g., parsing JSON and extracting data
+                }
+            }
+        });
+    }
 
     // All the tracks from all the users playlists
     // Returns a list of json files, each jsonfile is a playlist
-    public void getTracksFromAllPlaylists(Callback finalCallback) {
+    public void getTracksFromAllPlaylists(StringFunction runExe) {
+        Callback finalCallback=new Callback() {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                Log.e("Spotify API", "Failed to fetch playlists", e);
+            }
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                if (response.isSuccessful() && response.body() != null) {
+                    String jsonResponse = response.body().string();
+                    try {
+                        runExe.execute(jsonResponse);
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                } else {
+                    Log.e("Spotify API", "Response not successful or body is null");
+                }
+            }
+        };
         getUserPlaylists(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -287,5 +595,44 @@ public class SpotifyApiHelper {
             }
         });
 
+    }
+    @FunctionalInterface
+    public interface PlayListUtilFunction {
+        void execute(Map<String,PlaylistSongs> songs);
+    }
+
+    public void playlistUtil(PlayListUtilFunction fn){
+        SpotifyApiHelper spotifyHelper = new SpotifyApiHelper(accessToken);
+        System.out.println("inside playlistUtil");
+// Fetch the user's top tracks over the medium term
+        spotifyHelper.getUserTopTracks(topsongsstr -> {
+            PlaylistSongs.setTopItems(new JSONObject(topsongsstr));
+            spotifyHelper.getTracksFromAllPlaylists(allplaylistsstr -> {
+                //now, we have the top songs, and info from all playlists
+
+                try {
+                    //populate songOptions with relevant data
+                    HashMap<String,PlaylistSongs> songOptions = new HashMap<>();
+                    JSONArray jsonArray = new JSONArray(allplaylistsstr);
+                    JSONObject jsonObject = jsonArray.getJSONObject(0);
+                    JSONArray playlists = jsonObject.getJSONArray("items");
+                    for (int i = 0; i < playlists.length(); ++i){
+                        JSONObject playlist = playlists.getJSONObject(i);
+                        String playlistname = playlist.getString("name");
+                        songOptions.put(playlistname,new PlaylistSongs(jsonArray.getJSONObject(i+1)));
+                        System.out.println("Playlist Name");
+                        System.out.println(playlistname);
+                        System.out.println("Song Options");
+                        System.out.println(jsonArray.getJSONObject(i+1));
+                    }
+                    fn.execute(songOptions);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+                //JsonNameFinder.printFormattedJson(topsongsstr);
+            });}, "long_term");
     }
 }

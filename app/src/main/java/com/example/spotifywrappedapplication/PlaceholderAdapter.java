@@ -5,10 +5,13 @@ import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -55,9 +58,16 @@ public class PlaceholderAdapter extends RecyclerView.Adapter<PlaceholderAdapter.
         String name = fragmentData.getName();
         holder.textView.setText(name); // Assuming getName() returns the text you want to display
 
+        // Set the image for the ImageView using Picasso
+        String url = fragmentData.getImageUrl();
+        if (url != null && !url.isEmpty()) {
+            Picasso.get().load(url).into(holder.imageView);
+        }
+
         // Set an OnClickListener for the itemView
         holder.itemView.setOnClickListener(v -> listener.onItemClick(fragmentData));
     }
+
 
     public void updateData(FragmentData newData) {
         fragmentDataList.add(newData);
@@ -72,11 +82,13 @@ public class PlaceholderAdapter extends RecyclerView.Adapter<PlaceholderAdapter.
     static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView textView; // TextView for displaying the name.
         public View itemView; // This is already part of the superclass, included here for clarity.
+        ImageView imageView;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             this.textView = itemView.findViewById(R.id.text_view_id); // Make sure you have a TextView with an id in your item layout.
             this.itemView = itemView; // The itemView is the whole item view passed to the ViewHolder.
+            imageView = itemView.findViewById(R.id.image_view_id);
         }
 
     }
