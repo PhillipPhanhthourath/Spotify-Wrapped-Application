@@ -114,6 +114,8 @@ public class MainActivity extends AppCompatActivity {
 
                                     @Override
                                     public void onError(String error) {
+                                        final AuthorizationRequest request = getAuthenticationRequest(AuthorizationResponse.Type.TOKEN);
+                                        AuthorizationClient.openLoginActivity(MainActivity.this, AUTH_TOKEN_REQUEST_CODE, request);
                                         Log.e("Firebase", error);
                                         Toast.makeText(context, error, Toast.LENGTH_LONG).show();
                                     }
