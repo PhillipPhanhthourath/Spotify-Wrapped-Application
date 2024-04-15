@@ -13,6 +13,8 @@ import android.os.Bundle;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -74,6 +76,8 @@ public class MainActivity extends AppCompatActivity {
             onGetUserProfileClicked();
         });
 
+        View rootView = findViewById(android.R.id.content);
+        rootView.setOnTouchListener(new SlideUpGestureDetector(this));
     }
 
     /**
@@ -89,8 +93,8 @@ public class MainActivity extends AppCompatActivity {
         firebaseAnalytics.logEvent("your_custom_event_name", null);
 
         //showAuthDialog(this);
-        FirebaseAuth auth= FirebaseUtils.getInstance().getFirebaseAuth();
-        DialogUtils.showSignInDialog(this, new DialogUtils.AuthDialogListener(){
+        FirebaseAuth auth = FirebaseUtils.getInstance().getFirebaseAuth();
+        DialogUtils.showSignInDialog(this, new DialogUtils.AuthDialogListener() {
             @Override
             public void onSignIn(String email, String password, Context context) {
                 auth.signInWithEmailAndPassword(email, password)
@@ -156,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
                 if (response.isSuccessful()) {
                     String responseData = response.body().string();
                     System.out.println("Response from server: " + responseData);
-                    if (responseData.contains("The access token expired")){
+                    if (responseData.contains("The access token expired")) {
                         final AuthorizationRequest request = getAuthenticationRequest(AuthorizationResponse.Type.TOKEN);
                         AuthorizationClient.openLoginActivity(MainActivity.this, AUTH_TOKEN_REQUEST_CODE, request);
                     }
@@ -186,11 +190,10 @@ public class MainActivity extends AppCompatActivity {
     /**
      * When the app leaves this activity to momentarily get a token/code, this function
      * fetches the result of that external activity to get the response from Spotify
-     *
+     * <p>
      * In our case - this block of code will run once a response is received from the spotify API
-     *
+     * <p>
      * Will save the spotify login info to the users database
-     *
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -245,6 +248,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
+     *
+     */
+    public void onSlideUp() {
+        Intent intent = new Intent(MainActivity.this, PastSummariesActivity.class);
+        intent.putExtra("ACCESS_TOKEN", mAccessToken);
+        startActivity(intent);
+    }
+
+    /**
      * Get authentication request
      *
      * @param type the type of the request
@@ -253,7 +265,7 @@ public class MainActivity extends AppCompatActivity {
     private AuthorizationRequest getAuthenticationRequest(AuthorizationResponse.Type type) {
         return new AuthorizationRequest.Builder(CLIENT_ID, type, getRedirectUri().toString())
                 .setShowDialog(false)
-                .setScopes(new String[] { "user-read-email" }) // <--- Change the scope of your requested token here
+                .setScopes(new String[]{"user-read-email"}) // <--- Change the scope of your requested token here
                 .setCampaign("your-campaign-token")
                 .build();
     }
@@ -277,5 +289,44 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         cancelCall();
         super.onDestroy();
+    }
+
+    public class SlideUpGestureDetector implements View.OnTouchListener {
+        private GestureDetector gestureDetector;
+        private Context context;
+
+        public SlideUpGestureDetector(Context context) {
+            this.context = context;
+            gestureDetector = new GestureDetector(context, new GestureListener());
+        }
+
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            return gestureDetector.onTouchEvent(event);
+        }
+
+        private class GestureListener extends GestureDetector.SimpleOnGestureListener {
+            private static final int SWIPE_THRESHOLD = 100;
+            private static final int SWIPE_VELOCITY_THRESHOLD = 100;
+
+            @Override
+            public boolean onDown(MotionEvent e) {
+                return true;
+            }
+
+            @Override
+            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+                float diffY = e2.getY() - e1.getY();
+                if (Math.abs(diffY) > SWIPE_THRESHOLD && Math.abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
+                    if (diffY > 0) {
+                        // Slide-up detected
+                        onSlideUp();
+                        return true; // Consume the event
+                    }
+                }
+                return false;
+            }
+        }
+
     }
 }

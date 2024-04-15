@@ -9,7 +9,7 @@ public class WrappedHelper {
     public static Animation animation(Context context, String anim) {
         anim = anim.toLowerCase().trim();
         if (anim.equals("fly in")) {
-            return AnimationUtils.loadAnimation(context, R.anim.fly_in_animation);
+            return AnimationUtils.loadAnimation(context, R.anim.fly_in_top_animation);
         } else if (anim.equals("fly out")) {
             return AnimationUtils.loadAnimation(context, R.anim.fly_out_animation);
         } else if (anim.equals("fade in")) {
