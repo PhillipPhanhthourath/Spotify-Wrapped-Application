@@ -1,0 +1,8 @@
+<!-- res/anim/fly_in_bottom_animation.xml -->
+<set xmlns:android="http://schemas.android.com/apk/res/android">
+    <translate
+        android:fromYDelta="100%p"
+        android:toYDelta="0%p"
+        android:duration="3000"
+        />
+</set>
