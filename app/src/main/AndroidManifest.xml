@@ -29,6 +29,8 @@
             android:exported="false" />
         <activity android:name=".WrappedEndScreenActivity"
             android:exported="false"/>
+        <activity android:name=".PastSummariesActivity"
+            android:exported="false"/>
         <activity
             android:name=".MainActivity"
             android:exported="true">
