@@ -10,6 +10,9 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.TextView;
+import android.view.Gravity;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
@@ -20,7 +23,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
+import android.graphics.Typeface;
+import androidx.core.content.res.ResourcesCompat;
 public class FullScreenRedFragment extends Fragment {
     final int rowCount = 10;
     final int colCount = 10;
@@ -151,11 +155,26 @@ public class FullScreenRedFragment extends Fragment {
                 }
 
                 wordSearchGrid.addView(button);
+                Animation fadeInAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.fade_in_animation);
+                button.startAnimation(fadeInAnimation);
             }
         }
         TextView bottomtext = view.findViewById(R.id.game_strat_view);
+        Typeface typeface = ResourcesCompat.getFont(requireContext(), R.font.sen_bold);
+        bottomtext.setTypeface(typeface);
+        bottomtext.setTextSize(22);
         bottomtext.setText(String.join("\n", wordSearch.getWords()));
+        bottomtext.setGravity(Gravity.CENTER);
 
+
+        Animation animation = AnimationUtils.loadAnimation(requireContext(), R.anim.fly_in_bottom_animation);
+
+
+        bottomtext.startAnimation(animation);
+
+        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) bottomtext.getLayoutParams();
+        params.setMargins(0, 16, 0, 0); // Adjust the top margin as needed
+        bottomtext.setLayoutParams(params);
     }
 
 
