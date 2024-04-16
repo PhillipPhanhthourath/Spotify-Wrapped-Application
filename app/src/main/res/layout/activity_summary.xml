@@ -269,17 +269,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
-    <!--WebView
+    <WebView
         android:id="@+id/word_cloud"
         android:layout_width="300dp"
         android:layout_height="300dp"
         android:background="#FFC107"
-        android:visibility="visible"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" /-->
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <LinearLayout
         android:id="@+id/bar_graph"
@@ -315,7 +315,7 @@
                 android:textColor="#FFFFFF"
                 android:textSize="16sp" />
 
-            <TextView
+            <!--TextView
                 android:id="@+id/percent1"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
@@ -325,7 +325,7 @@
                 android:text="@string/random_number"
                 android:textColor="#000000"
                 android:textSize="16sp"
-                android:textStyle="italic" />
+                android:textStyle="italic"/-->
         </LinearLayout>
 
         <LinearLayout
@@ -347,7 +347,7 @@
                 android:textColor="#FFFFFF"
                 android:textSize="16sp" />
 
-            <TextView
+            <!--TextView
                 android:id="@+id/percent2"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
@@ -357,7 +357,7 @@
                 android:text="@string/random_number"
                 android:textColor="#000000"
                 android:textSize="16sp"
-                android:textStyle="italic" />
+                android:textStyle="italic" /-->
         </LinearLayout>
 
         <LinearLayout
@@ -379,7 +379,7 @@
                 android:textColor="#FFFFFF"
                 android:textSize="16sp" />
 
-            <TextView
+            <!--TextView
                 android:id="@+id/percent3"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
@@ -389,7 +389,7 @@
                 android:text="@string/random_number"
                 android:textColor="#000000"
                 android:textSize="16sp"
-                android:textStyle="italic" />
+                android:textStyle="italic" /-->
         </LinearLayout>
 
         <LinearLayout
@@ -411,7 +411,7 @@
                 android:textColor="#FFFFFF"
                 android:textSize="16sp" />
 
-            <TextView
+            <!--TextView
                 android:id="@+id/percent4"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
@@ -421,7 +421,7 @@
                 android:text="@string/random_number"
                 android:textColor="#000000"
                 android:textSize="16sp"
-                android:textStyle="italic" />
+                android:textStyle="italic" /-->
         </LinearLayout>
 
         <LinearLayout
@@ -442,18 +442,6 @@
                 android:text="@string/random_text"
                 android:textColor="#FFFFFF"
                 android:textSize="16sp" />
-
-            <TextView
-                android:id="@+id/percent5"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginStart="5dp"
-                android:gravity="center_vertical|start"
-                android:fontFamily="@font/sen_bold"
-                android:text="@string/random_number"
-                android:textColor="#000000"
-                android:textSize="16sp"
-                android:textStyle="italic" />
         </LinearLayout>
 
     </LinearLayout>
@@ -484,22 +472,22 @@
 
             <ImageView
                 android:id="@+id/image1a"
-                android:layout_width="wrap_content"
+                android:layout_width="30dp"
                 android:layout_height="match_parent"
-                android:background="#4CAF50"
-                android:src="@drawable/ic_game" />
+                android:src="@drawable/ic_game"/>
 
             <TextView
                 android:id="@+id/text1a"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_marginHorizontal="60dp"
+                android:layout_marginHorizontal="30dp"
                 android:fontFamily="@font/sen_bold"
                 android:gravity="center"
                 android:text="@string/random_text"
                 android:textColor="#000000"
                 android:textSize="20sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:singleLine="true" />
         </LinearLayout>
 
         <LinearLayout
@@ -514,22 +502,22 @@
 
             <ImageView
                 android:id="@+id/image2a"
-                android:layout_width="wrap_content"
+                android:layout_width="30dp"
                 android:layout_height="match_parent"
-                android:background="#4CAF50"
                 android:src="@drawable/ic_game" />
 
             <TextView
                 android:id="@+id/text2a"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_marginHorizontal="60dp"
+                android:layout_marginHorizontal="30dp"
                 android:fontFamily="@font/sen_bold"
                 android:gravity="center"
                 android:text="@string/random_text"
                 android:textColor="#000000"
                 android:textSize="20sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:singleLine="true"/>
         </LinearLayout>
 
         <LinearLayout
@@ -544,22 +532,22 @@
 
             <ImageView
                 android:id="@+id/image3a"
-                android:layout_width="wrap_content"
+                android:layout_width="30dp"
                 android:layout_height="match_parent"
-                android:background="#4CAF50"
                 android:src="@drawable/ic_game" />
 
             <TextView
                 android:id="@+id/text3a"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_marginHorizontal="60dp"
+                android:layout_marginHorizontal="30dp"
                 android:fontFamily="@font/sen_bold"
                 android:gravity="center"
                 android:text="@string/random_text"
                 android:textColor="#000000"
                 android:textSize="20sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:singleLine="true"/>
         </LinearLayout>
 
         <LinearLayout
@@ -574,22 +562,22 @@
 
             <ImageView
                 android:id="@+id/image4a"
-                android:layout_width="wrap_content"
+                android:layout_width="30dp"
                 android:layout_height="match_parent"
-                android:background="#4CAF50"
                 android:src="@drawable/ic_game" />
 
             <TextView
                 android:id="@+id/text4a"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_marginHorizontal="60dp"
+                android:layout_marginHorizontal="30dp"
                 android:fontFamily="@font/sen_bold"
                 android:gravity="center"
                 android:text="@string/random_text"
                 android:textColor="#000000"
                 android:textSize="20sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:singleLine="true"/>
         </LinearLayout>
 
         <LinearLayout
@@ -604,22 +592,22 @@
 
             <ImageView
                 android:id="@+id/image5a"
-                android:layout_width="wrap_content"
+                android:layout_width="30dp"
                 android:layout_height="match_parent"
-                android:background="#4CAF50"
                 android:src="@drawable/ic_game" />
 
             <TextView
                 android:id="@+id/text5a"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_marginHorizontal="60dp"
+                android:layout_marginHorizontal="30dp"
                 android:fontFamily="@font/sen_bold"
                 android:gravity="center"
                 android:text="@string/random_text"
                 android:textColor="#000000"
                 android:textSize="20sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:singleLine="true"/>
         </LinearLayout>
 
 
@@ -651,22 +639,22 @@
 
             <ImageView
                 android:id="@+id/image1b"
-                android:layout_width="wrap_content"
+                android:layout_width="30dp"
                 android:layout_height="match_parent"
-                android:background="#4CAF50"
                 android:src="@drawable/ic_game" />
 
             <TextView
                 android:id="@+id/text1b"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_marginHorizontal="60dp"
+                android:layout_marginHorizontal="30dp"
                 android:fontFamily="@font/sen_bold"
                 android:gravity="center"
                 android:text="@string/random_text"
                 android:textColor="#000000"
                 android:textSize="20sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:singleLine="true"/>
         </LinearLayout>
 
         <LinearLayout
@@ -681,22 +669,22 @@
 
             <ImageView
                 android:id="@+id/image2b"
-                android:layout_width="wrap_content"
+                android:layout_width="30dp"
                 android:layout_height="match_parent"
-                android:background="#4CAF50"
                 android:src="@drawable/ic_game" />
 
             <TextView
                 android:id="@+id/text2b"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_marginHorizontal="60dp"
+                android:layout_marginHorizontal="30dp"
                 android:fontFamily="@font/sen_bold"
                 android:gravity="center"
                 android:text="@string/random_text"
                 android:textColor="#000000"
                 android:textSize="20sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:singleLine="true"/>
         </LinearLayout>
 
         <LinearLayout
@@ -711,22 +699,22 @@
 
             <ImageView
                 android:id="@+id/image3b"
-                android:layout_width="wrap_content"
+                android:layout_width="30dp"
                 android:layout_height="match_parent"
-                android:background="#4CAF50"
                 android:src="@drawable/ic_game" />
 
             <TextView
                 android:id="@+id/text3b"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_marginHorizontal="60dp"
+                android:layout_marginHorizontal="30dp"
                 android:fontFamily="@font/sen_bold"
                 android:gravity="center"
                 android:text="@string/random_text"
                 android:textColor="#000000"
                 android:textSize="20sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:singleLine="true"/>
         </LinearLayout>
 
         <LinearLayout
@@ -741,22 +729,22 @@
 
             <ImageView
                 android:id="@+id/image4b"
-                android:layout_width="wrap_content"
+                android:layout_width="30dp"
                 android:layout_height="match_parent"
-                android:background="#4CAF50"
                 android:src="@drawable/ic_game" />
 
             <TextView
                 android:id="@+id/text4b"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_marginHorizontal="60dp"
+                android:layout_marginHorizontal="30dp"
                 android:fontFamily="@font/sen_bold"
                 android:gravity="center"
                 android:text="@string/random_text"
                 android:textColor="#000000"
                 android:textSize="20sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:singleLine="true"/>
         </LinearLayout>
 
         <LinearLayout
@@ -771,22 +759,22 @@
 
             <ImageView
                 android:id="@+id/image5b"
-                android:layout_width="wrap_content"
+                android:layout_width="30dp"
                 android:layout_height="match_parent"
-                android:background="#4CAF50"
                 android:src="@drawable/ic_game" />
 
             <TextView
                 android:id="@+id/text5b"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_marginHorizontal="60dp"
+                android:layout_marginHorizontal="30dp"
                 android:fontFamily="@font/sen_bold"
                 android:gravity="center"
                 android:text="@string/random_text"
                 android:textColor="#000000"
                 android:textSize="20sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:singleLine="true"/>
         </LinearLayout>
 
 

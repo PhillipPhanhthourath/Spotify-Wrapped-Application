@@ -107,6 +107,7 @@ public class WrappedEndScreenActivity extends AppCompatActivity {
      */
     public void returnToMain() {
         Intent intent = new Intent(WrappedEndScreenActivity.this, MainActivity.class);
+        intent.putExtra("ACCESS_TOKEN", getIntent().getStringExtra("ACCESS_TOKEN"));
         startActivity(intent);
     }
 

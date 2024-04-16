@@ -46,7 +46,7 @@ class PlaylistSongs {
                 JSONObject track = item.getJSONObject("track");
                 // Create a new Song object with the track JSON object
                 Song song = this.createSong(track);
-                System.out.println(song);
+                // System.out.println(song);
                 this.songs.add(song);
             }
         } catch (JSONException e) {
@@ -177,6 +177,7 @@ class PlaylistSongs {
             this.urlToImage = urlToImage;
         }
     }
+
     // Factory method to manage artist instances
     private Map<String, Artist> artistRegistry = new HashMap<>();
     public Artist createArtist(JSONObject artistJson) throws JSONException {
@@ -363,6 +364,44 @@ public class SpotifyApiHelper {
         void execute(String data) throws JSONException;
     }
 
+    public void getUserSavedTracks(StringFunction responseExe) {
+        Callback responseCallback = new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                // Handle the failure case
+                System.out.println("getUserSavedTracks failed");
+                e.printStackTrace();
+            }
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (!response.isSuccessful()) {
+                    throw new IOException("Unexpected code " + response);
+                } else {
+                    // Here you can handle the JSON response
+                    String responseData = response.body().string();
+                    try {
+                        responseExe.execute(responseData);
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                    // Further processing of the data, e.g., parsing JSON and extracting data
+                }
+            }
+        };
+
+        // Construct the URL
+        String url = "https://api.spotify.com/v1/me/tracks?limit=50";
+        // Build the request with the necessary authorization header and the URL
+        Request request = new Request.Builder()
+                .url(url)
+                .header("Authorization", "Bearer " + accessToken)
+                .build();
+
+
+        // Enqueue the request with the callback to handle the response
+        client.newCall(request).enqueue(responseCallback);
+    }
+
     public void getUserTopTracks(StringFunction responseExe, String timeRange) {
         Callback responseCallback = new Callback() {
             @Override
@@ -396,6 +435,43 @@ public class SpotifyApiHelper {
                 .build();
         
         
+        // Enqueue the request with the callback to handle the response
+        client.newCall(request).enqueue(responseCallback);
+    }
+
+    public void getUserTopArtists(StringFunction responseExe, String timeRange) {
+        Callback responseCallback = new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                // Handle the failure case
+                System.out.println("getUserTopArtists failed");
+                e.printStackTrace();
+            }
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (!response.isSuccessful()) {
+                    throw new IOException("Unexpected code " + response);
+                } else {
+                    // Here you can handle the JSON response
+                    String responseData = response.body().string();
+                    try {
+                        responseExe.execute(responseData);
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                    // Further processing of the data, e.g., parsing JSON and extracting data
+                }
+            }
+        };
+        // Construct the URL with a time range query parameter
+        String url = "https://api.spotify.com/v1/me/top/artists?time_range=" + timeRange;
+        // Build the request with the necessary authorization header and the URL
+        Request request = new Request.Builder()
+                .url(url)
+                .header("Authorization", "Bearer " + accessToken)
+                .build();
+
+
         // Enqueue the request with the callback to handle the response
         client.newCall(request).enqueue(responseCallback);
     }
@@ -450,7 +526,7 @@ public class SpotifyApiHelper {
     // All the tracks from all the users playlists
     // Returns a list of json files, each jsonfile is a playlist
     public void getTracksFromAllPlaylists(StringFunction runExe) {
-        Callback finalCallback=new Callback() {
+        Callback finalCallback =new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 Log.e("Spotify API", "Failed to fetch playlists", e);
