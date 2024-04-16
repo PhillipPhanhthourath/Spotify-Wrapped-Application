@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         generateSummaryBtn.setOnClickListener((v) -> {
-            testUtils(new SpotifyApiHelper(mAccessToken));
+            // testUtils(new SpotifyApiHelper(mAccessToken));
             onGetUserProfileClicked();
         });
 

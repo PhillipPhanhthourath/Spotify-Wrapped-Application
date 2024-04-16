@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
-import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -62,7 +61,7 @@ public class WrappedPartTwoActivity extends AppCompatActivity {
 
         // Set the click listeners for the buttons & gesture detector
         buttonBack.setOnClickListener((v) -> {
-            returnToMain();
+            returnToPartOne();
         });
 
         buttonNext.setOnClickListener((v) -> {
@@ -81,8 +80,9 @@ public class WrappedPartTwoActivity extends AppCompatActivity {
     /**
      * Return to the main page
      */
-    public void returnToMain() {
+    public void returnToPartOne() {
         Intent intent = new Intent(WrappedPartTwoActivity.this, WrappedPartOneActivity.class);
+        intent.putExtra("ACCESS_TOKEN", getIntent().getStringExtra("ACCESS_TOKEN"));
         startActivity(intent);
     }
 

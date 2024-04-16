@@ -98,6 +98,7 @@ public class WrappedPartThreeActivity extends AppCompatActivity {
      */
     protected void returnToPartTwo() {
         Intent intent = new Intent(WrappedPartThreeActivity.this, WrappedPartTwoActivity.class);
+        intent.putExtra("ACCESS_TOKEN", getIntent().getStringExtra("ACCESS_TOKEN"));
         startActivity(intent);
     }
 

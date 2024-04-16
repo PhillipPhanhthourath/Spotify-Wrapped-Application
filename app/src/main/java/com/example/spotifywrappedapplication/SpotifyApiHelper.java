@@ -400,6 +400,43 @@ public class SpotifyApiHelper {
         client.newCall(request).enqueue(responseCallback);
     }
 
+    public void getUserTopArtists(StringFunction responseExe, String timeRange) {
+        Callback responseCallback = new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                // Handle the failure case
+                System.out.println("getUserTopArtists failed");
+                e.printStackTrace();
+            }
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (!response.isSuccessful()) {
+                    throw new IOException("Unexpected code " + response);
+                } else {
+                    // Here you can handle the JSON response
+                    String responseData = response.body().string();
+                    try {
+                        responseExe.execute(responseData);
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                    // Further processing of the data, e.g., parsing JSON and extracting data
+                }
+            }
+        };
+        // Construct the URL with a time range query parameter
+        String url = "https://api.spotify.com/v1/me/top/artists?time_range=" + timeRange;
+        // Build the request with the necessary authorization header and the URL
+        Request request = new Request.Builder()
+                .url(url)
+                .header("Authorization", "Bearer " + accessToken)
+                .build();
+
+
+        // Enqueue the request with the callback to handle the response
+        client.newCall(request).enqueue(responseCallback);
+    }
+
     public void getArtistFromID(StringFunction responseExe, String artistId) {
         // Construct the URL using the artist ID
         String url = "https://api.spotify.com/v1/artists/" + artistId;
@@ -450,7 +487,7 @@ public class SpotifyApiHelper {
     // All the tracks from all the users playlists
     // Returns a list of json files, each jsonfile is a playlist
     public void getTracksFromAllPlaylists(StringFunction runExe) {
-        Callback finalCallback=new Callback() {
+        Callback finalCallback =new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 Log.e("Spotify API", "Failed to fetch playlists", e);

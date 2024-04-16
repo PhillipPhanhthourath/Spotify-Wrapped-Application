@@ -1,6 +1,7 @@
 package com.example.spotifywrappedapplication;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -25,6 +26,12 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Random;
+import java.util.Set;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -34,11 +41,12 @@ public class WrappedPartOneActivity extends AppCompatActivity {
     private GridLayout frontCard;
     private ImageView[] covers;
     private TextView backCard;
-
+    private String mAccessToken;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_summary);
+        mAccessToken = this.getIntent().getStringExtra("ACCESS_TOKEN");
 
         // Set up frontCard and backCard
         covers = new ImageView[]{findViewById(R.id.cover1), findViewById(R.id.cover2), findViewById(R.id.cover3), findViewById(R.id.cover4),
@@ -46,99 +54,11 @@ public class WrappedPartOneActivity extends AppCompatActivity {
                 findViewById(R.id.cover9), findViewById(R.id.cover10), findViewById(R.id.cover11), findViewById(R.id.cover12),
                 findViewById(R.id.cover13), findViewById(R.id.cover14), findViewById(R.id.cover15), findViewById(R.id.cover16)};
         frontCard = findViewById(R.id.grid_image_card);
-        frontCard.setVisibility(View.VISIBLE);
-        frontCard.startAnimation(WrappedHelper.animation(this, "fade in"));
         backCard = findViewById(R.id.text_card);
         backCard.setVisibility(View.INVISIBLE);
-        // LAYER 1: FETCH TOKEN
-        FirebaseUser user = FirebaseUtils.getInstance().getFirebaseAuth().getCurrentUser();
-        FirebaseUtils.fetchAccessToken(user, new FirebaseUtils.TokenFetchListener() {
-            @Override
-            public void onTokenFetched(String token) {
-                Log.d("Firebase", "Access token fetched: " + token);
-                SpotifyApiHelper helper = new SpotifyApiHelper(token); // Proceed with using the token
-
-                // LAYER 2: FETCH GENRES
-                helper.getUserPlaylists(new Callback() {
-                    @Override
-                    public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                        Log.e("Spotify API", "Failed to fetch playlists", e);
-                    }
-                    @Override
-                    public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                        if (response.isSuccessful() && response.body() != null) {
-                            try {
-                                JSONObject jsonObject = new JSONObject(response.body().string());
-                                // get playlist images to populate the frontCard
-                                JSONArray playlists = jsonObject.getJSONArray("items");
-                                ArrayList<String> urls = new ArrayList<>();
-                                ArrayList<String> names = new ArrayList<>();
-                                for (int i = 0; i < playlists.length() && urls.size() < covers.length; i++) {
-                                    JSONObject playlist = playlists.getJSONObject(i);
-                                    if (!playlist.get("images").toString().equals("null")) {
-                                        JSONArray images = playlist.getJSONArray("images");
-                                        urls.add(images.getJSONObject(0).getString("url"));
-                                    } else {
-                                        /*JSONArray tracks = playlist.getJSONArray("tracks");
-                                        JSONObject firstTrack = tracks.getJSONObject(0);
-                                        JSONObject album = firstTrack.getJSONObject("album");
-                                        urls.add(album.getJSONArray("images").getJSONObject(0).getString("url"));
-                                        */
-                                        helper.getTracksFromAPlaylist(new Callback() {
-                                            @Override
-                                            public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                                                Log.e("Spotify API", "Failed to fetch playlist", e);
-                                            }
-                                            @Override
-                                            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                                                try {
-                                                    assert response.body() != null;
-                                                    JSONObject trackObject = new JSONObject(response.body().string());
-                                                    JSONArray tracks = trackObject.getJSONArray("items");
-                                                    if (tracks.length() > 0) {
-                                                        JSONObject firstTrack = tracks.getJSONObject(0).getJSONObject("track");
-                                                        JSONObject album = firstTrack.getJSONObject("album");
-                                                        urls.add(album.getJSONArray("images").getJSONObject(0).getString("url"));
-                                                    }
-                                                } catch (JSONException e) {
-                                                    e.printStackTrace();
-                                                }
-
-                                            }
-                                        }, playlist.getString("id"));
-
-                                    }
-                                    names.add(playlist.getString("name"));
-                                }
-                                Collections.shuffle(urls);
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        for (int i = 0; i < covers.length && i < urls.size(); i++) {
-                                            Picasso.get().load(urls.get(i)).into(covers[i]);
-                                        }
-                                        String backCardText = "";
-                                        for (int i = 0; i < names.size() && i < 10; i++) {
-                                            backCardText += names.get(i) + "\n";
-                                        }
-                                        backCard.setText(backCardText);
-                                    }
-                                });
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        } else {
-                            Log.e("Spotify API", "Response not successful or body is null");
-                        }
-                    }
-                });
-            }
-
-            @Override
-            public void onError(String error) {
-                Log.e("Firebase", error);
-            }
-        });
+        populateCards();
+        frontCard.setVisibility(View.VISIBLE);
+        frontCard.startAnimation(WrappedHelper.animation(this, "fade in"));
 
         // Set up rest of view on arrival to page
         TextView title = findViewById(R.id.title_text);
@@ -168,6 +88,80 @@ public class WrappedPartOneActivity extends AppCompatActivity {
 
         backCard.setOnClickListener((v) -> {
             WrappedHelper.flipCard(this, frontCard, backCard);
+        });
+    }
+
+    protected void populateCards() {
+        SpotifyApiHelper apiHelper = new SpotifyApiHelper(mAccessToken);
+        apiHelper.playlistUtil((playlists) -> {
+            String nameList = "";
+            String[] imageUrls = new String[covers.length];
+            // getting 16 (or fewer) random playlists
+            System.out.println("made it into playlistUtil call");
+            List<String> temp = new ArrayList<>(playlists.keySet());
+            List<String> playlistNames = new ArrayList<>();
+            // if someone has a lot of playlists
+            if (temp.size() > covers.length * 10) {
+                Random rand = new Random();
+                Set<Integer> visited = new HashSet<>();
+                while (visited.size() < covers.length) {
+                    int index = rand.nextInt(playlistNames.size());
+                    playlistNames.add(temp.get(index));
+                    visited.add(index);
+                }
+            } else if (temp.size() > covers.length) {
+                Random rand = new Random();
+                int index = rand.nextInt(temp.size() - covers.length);
+                playlistNames = temp.subList(index, index + covers.length);
+            } else {
+                playlistNames = temp;
+            }
+            /*for (String name: playlistNames) {
+                System.out.print(name);
+            }
+            System.out.println();*/
+            // creating the name list
+            int index = 0;
+            int songIndex = 0;
+            while (index < imageUrls.length && songIndex < 5) {
+                for (String name: playlistNames) {
+                    List<PlaylistSongs.Song> topSongs = Objects.requireNonNull(playlists.get(name)).top5SongsFreq();
+                    if (songIndex < topSongs.size()) {
+                        PlaylistSongs.Song topSong = topSongs.get(songIndex);
+                        imageUrls[index++] = topSong.getUrlToImage();
+                    }
+                    if (index == imageUrls.length) {
+                        break;
+                    }
+                }
+                songIndex++;
+            }
+            /*
+            for (String name: playlistNames) {
+                nameList += name + "\n";
+                List<PlaylistSongs.Song> topSongs = Objects.requireNonNull(playlists.get(name)).top5SongsFreq();
+                if (topSongs.size() > 0) {
+                    PlaylistSongs.Song topSong = topSongs.get(0);
+                    imageUrls[urlIndex++] = topSong.getUrlToImage();
+                }
+                if (urlIndex == imageUrls.length) {
+                    break;
+                }
+            }*/
+            List<String> finalPlaylistNames = playlistNames;
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    for (int i = 0; i < covers.length; i++) {
+                        Picasso.get().load(imageUrls[i]).into(covers[i]);
+                    }
+                    String nameList = "";
+                    for (int i = 0; i < finalPlaylistNames.size() && i < 8; i++) {
+                        nameList += finalPlaylistNames.get(i) + "\n";
+                    }
+                    backCard.setText(nameList);
+                }
+            });
         });
     }
 
