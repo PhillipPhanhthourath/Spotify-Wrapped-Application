@@ -364,6 +364,44 @@ public class SpotifyApiHelper {
         void execute(String data) throws JSONException;
     }
 
+    public void getUserSavedTracks(StringFunction responseExe) {
+        Callback responseCallback = new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                // Handle the failure case
+                System.out.println("getUserSavedTracks failed");
+                e.printStackTrace();
+            }
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (!response.isSuccessful()) {
+                    throw new IOException("Unexpected code " + response);
+                } else {
+                    // Here you can handle the JSON response
+                    String responseData = response.body().string();
+                    try {
+                        responseExe.execute(responseData);
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                    // Further processing of the data, e.g., parsing JSON and extracting data
+                }
+            }
+        };
+
+        // Construct the URL
+        String url = "https://api.spotify.com/v1/me/tracks?limit=50";
+        // Build the request with the necessary authorization header and the URL
+        Request request = new Request.Builder()
+                .url(url)
+                .header("Authorization", "Bearer " + accessToken)
+                .build();
+
+
+        // Enqueue the request with the callback to handle the response
+        client.newCall(request).enqueue(responseCallback);
+    }
+
     public void getUserTopTracks(StringFunction responseExe, String timeRange) {
         Callback responseCallback = new Callback() {
             @Override
