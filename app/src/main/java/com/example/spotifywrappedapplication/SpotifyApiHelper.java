@@ -46,7 +46,7 @@ class PlaylistSongs {
                 JSONObject track = item.getJSONObject("track");
                 // Create a new Song object with the track JSON object
                 Song song = this.createSong(track);
-                System.out.println(song);
+                // System.out.println(song);
                 this.songs.add(song);
             }
         } catch (JSONException e) {

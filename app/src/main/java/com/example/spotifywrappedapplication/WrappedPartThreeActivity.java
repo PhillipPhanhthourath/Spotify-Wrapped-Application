@@ -119,32 +119,32 @@ public class WrappedPartThreeActivity extends AppCompatActivity {
             }
         }, "short_term");
 
-        /*
+
         helper.getUserTopTracks((responseStr) -> {
+            System.out.println("Got user top tracks.");
+            System.out.println(responseStr);
             JSONObject response = new JSONObject(responseStr);
             JSONArray tracks = response.getJSONArray("items");
-            for (int i = 0; i < tracks.length(); i++) {
-                JSONObject artist = tracks.getJSONObject(i);
-                helper.getArtistFromID((a) -> {
-                    JSONObject fullArtist = new JSONObject(a);
-                    JSONArray images = fullArtist.getJSONArray("images");
-                    JSONObject icon = images.getJSONObject(0);
-                    String url = icon.getString("url");
-                    String name = fullArtist.getString("name");
+            for (int i = 0; i < 5; i++) {
+                JSONObject track = tracks.getJSONObject(i);
+                JSONObject album = track.getJSONObject("album");
+                JSONObject image = album.getJSONArray("images").getJSONObject(0);
+                String url = image.getString("url");
+                String name = track.getString("name");
+                int finalI = i;
+                runOnUiThread(new Runnable() {
 
-                    // populate card
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            for (int i = 0; i < frontImages.length; i++) {
-                                Picasso.get().load(url).into(frontImages[i]);
-                                frontNames[i].setText(name);
-                            }
+                    @Override
+                    public void run() {
+                        Picasso.get().load(url).resize(10, 0).into(backImages[finalI]);
+                        backNames[finalI].setText(name);
+                        if (name.length() > 15) {
+                            backNames[finalI].setTextSize(15);
                         }
-                    });
-                }, artist.getString("id"));
+                    }
+                });
             }
-        }, "short_term");*/
+        }, "short_term");
     }
 
     /**
