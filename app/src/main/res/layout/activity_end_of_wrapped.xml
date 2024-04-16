@@ -13,7 +13,7 @@
         android:background="@drawable/rounded_button"
         android:fontFamily="@font/sen_bold"
         android:padding="5dp"
-        android:text="@string/maybe_later"
+        android:text="Log out"
         android:textColor="#FAFAFA"
         android:textSize="10sp"
         android:textStyle="bold"
