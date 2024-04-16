@@ -177,6 +177,7 @@ class PlaylistSongs {
             this.urlToImage = urlToImage;
         }
     }
+
     // Factory method to manage artist instances
     private Map<String, Artist> artistRegistry = new HashMap<>();
     public Artist createArtist(JSONObject artistJson) throws JSONException {

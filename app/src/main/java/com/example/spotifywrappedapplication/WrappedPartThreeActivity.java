@@ -2,6 +2,7 @@ package com.example.spotifywrappedapplication;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -22,6 +23,7 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,37 +35,31 @@ import okhttp3.Response;
 
 public class WrappedPartThreeActivity extends AppCompatActivity {
     private LinearLayout frontCard;
+    private ImageView[] frontImages;
+    private TextView[] frontNames;
     private LinearLayout backCard;
+    private ImageView[] backImages;
+    private TextView[] backNames;
+    private String mAccessToken;
 
     @SuppressLint("CutPasteId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_summary);
+        mAccessToken = this.getIntent().getStringExtra("ACCESS_TOKEN");
 
         // Set up frontCard and backCard
         frontCard = findViewById(R.id.top_5_card_a);
+        frontImages = new ImageView[]{findViewById(R.id.image1a), findViewById(R.id.image2a), findViewById(R.id.image3a), findViewById(R.id.image4a), findViewById(R.id.image5a)};
+        frontNames = new TextView[]{findViewById(R.id.text1a), findViewById(R.id.text2a), findViewById(R.id.text3a), findViewById(R.id.text4a), findViewById(R.id.text5a)};
         frontCard.setVisibility(View.VISIBLE);
         frontCard.startAnimation(WrappedHelper.animation(this, "fade in"));
         backCard = findViewById(R.id.top_5_card_b);
+        backImages = new ImageView[]{findViewById(R.id.image1b), findViewById(R.id.image2b), findViewById(R.id.image3b), findViewById(R.id.image4b), findViewById(R.id.image5b)};
+        backNames = new TextView[]{findViewById(R.id.text1b), findViewById(R.id.text2b), findViewById(R.id.text3b), findViewById(R.id.text4b), findViewById(R.id.text5b)};
         backCard.setVisibility(View.INVISIBLE);
-
-        // LAYER 1: FETCH TOKEN
-        FirebaseUser user = FirebaseUtils.getInstance().getFirebaseAuth().getCurrentUser();
-        FirebaseUtils.fetchAccessToken(user, new FirebaseUtils.TokenFetchListener() {
-            @Override
-            public void onTokenFetched(String token) {
-                Log.d("Firebase", "Access token fetched: " + token);
-                SpotifyApiHelper helper = new SpotifyApiHelper(token); // Proceed with using the token
-
-                // LAYER 2: FETCH GENRES
-            }
-
-            @Override
-            public void onError(String error) {
-                Log.e("Firebase", error);
-            }
-        });
+        populateCards();
 
         // Set up rest of view on arrival to page
         TextView title = findViewById(R.id.title_text);
@@ -91,6 +87,64 @@ public class WrappedPartThreeActivity extends AppCompatActivity {
         backCard.setOnClickListener((v) -> {
             WrappedHelper.flipCard(this, frontCard, backCard);
         });
+    }
+
+    protected void populateCards() {
+        SpotifyApiHelper helper = new SpotifyApiHelper(mAccessToken);
+        helper.getUserTopArtists((responseStr) -> {
+            JSONObject response = new JSONObject(responseStr);
+            JSONArray artists = response.getJSONArray("items");
+            for (int i = 0; i < 5; i++) {
+                JSONObject artist = artists.getJSONObject(i);
+                int finalI = i;
+                helper.getArtistFromID((a) -> {
+                    JSONObject fullArtist = new JSONObject(a);
+                    JSONArray images = fullArtist.getJSONArray("images");
+                    JSONObject icon = images.getJSONObject(0);
+                    String url = icon.getString("url");
+                    String name = fullArtist.getString("name");
+
+                    // populate card
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Picasso.get().load(url).resize(10, 0).into(frontImages[finalI]);
+                            frontNames[finalI].setText(name);
+                            if (name.length() > 12) {
+                                frontNames[finalI].setTextSize(15);
+                            }
+                        }
+                    });
+                }, artist.getString("id"));
+            }
+        }, "short_term");
+
+        /*
+        helper.getUserTopTracks((responseStr) -> {
+            JSONObject response = new JSONObject(responseStr);
+            JSONArray tracks = response.getJSONArray("items");
+            for (int i = 0; i < tracks.length(); i++) {
+                JSONObject artist = tracks.getJSONObject(i);
+                helper.getArtistFromID((a) -> {
+                    JSONObject fullArtist = new JSONObject(a);
+                    JSONArray images = fullArtist.getJSONArray("images");
+                    JSONObject icon = images.getJSONObject(0);
+                    String url = icon.getString("url");
+                    String name = fullArtist.getString("name");
+
+                    // populate card
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            for (int i = 0; i < frontImages.length; i++) {
+                                Picasso.get().load(url).into(frontImages[i]);
+                                frontNames[i].setText(name);
+                            }
+                        }
+                    });
+                }, artist.getString("id"));
+            }
+        }, "short_term");*/
     }
 
     /**
