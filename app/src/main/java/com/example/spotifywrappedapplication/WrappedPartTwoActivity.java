@@ -30,7 +30,7 @@ import java.util.stream.Stream;
 
 public class WrappedPartTwoActivity extends AppCompatActivity {
     private String mAccessToken;
-    private LinearLayout frontCard;
+    private TextView frontCard;
     private LinearLayout backCard;
     private LinearLayout[] bars;
     private TextView[] genres;
@@ -110,7 +110,8 @@ public class WrappedPartTwoActivity extends AppCompatActivity {
             JSONObject response = new JSONObject(responseStr);
             JSONArray tracks = response.getJSONArray("items");
             Map<String, Integer> genreFreqs = new HashMap<>();
-            List<String> genresList = new ArrayList<>();
+            // List<String> genresList = new ArrayList<>();
+            StringBuilder genreStr = new StringBuilder();
             for (int i = 0; i < tracks.length(); i++) {
                 JSONObject track = tracks.getJSONObject(i).getJSONObject("track");
                 JSONArray artists = track.getJSONArray("artists");
@@ -118,11 +119,10 @@ public class WrappedPartTwoActivity extends AppCompatActivity {
                     System.out.println("made it into getArtistFromID");
                     JSONObject artist = new JSONObject(artistResponseStr);
                     JSONArray genres = artist.getJSONArray("genres");
-                    System.out.println(genres.toString());
                     for (int j = 0; j < genres.length(); j++) {
                         System.out.print(genres.getString(j));
                         String genre = genres.getString(j);
-                        genresList.add(genre);
+                        genreStr.append(genre).append(" ");
                         int freq = genreFreqs.getOrDefault(genre, 0);
                         genreFreqs.put(genre, freq + 1);
                     }
@@ -137,6 +137,8 @@ public class WrappedPartTwoActivity extends AppCompatActivity {
 
                 @Override
                 public void run() {
+                    System.out.println("genreStr: " + genreStr.toString());
+                    frontCard.setText(genreStr.toString());
                     Random rand = new Random();
                     Integer[] colors = new Integer[]{
                             Color.parseColor("#FF1493"), // Neon Pink
@@ -152,16 +154,7 @@ public class WrappedPartTwoActivity extends AppCompatActivity {
                             Color.parseColor("#FF8C00"),  // Dark Orange
                             Color.parseColor("#9370DB"), // Medium Purple
                     };
-                    int bound = 300;
-                    int randomIndices = rand.nextInt(1 << colors.length);
-                    // set bg colors
-                    /*int barIndex = 0;
-                    for (int i = 0; barIndex < 5; i++) {
-                        if ((((randomIndices >> i) & 1) == 1)) {
-                            genres[barIndex++].setBackgroundColor(colors[i]);
-                        }
-                    }*/
-                    for (int i = 0; i < genresSorted.size() && i < 5; i++, bound-=50) {
+                    for (int i = 0; i < genresSorted.size() && i < 5; i++) {
                         genres[i].setText(genresSorted.get(i));
                         genres[i].setBackgroundColor(colors[rand.nextInt(colors.length)]);
                         LinearLayout.LayoutParams params1 = (LinearLayout.LayoutParams) bars[i].getLayoutParams();
