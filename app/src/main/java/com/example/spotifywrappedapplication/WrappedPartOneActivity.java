@@ -94,10 +94,9 @@ public class WrappedPartOneActivity extends AppCompatActivity {
     protected void populateCards() {
         SpotifyApiHelper apiHelper = new SpotifyApiHelper(mAccessToken);
         apiHelper.playlistUtil((playlists) -> {
-            String nameList = "";
             String[] imageUrls = new String[covers.length];
             // getting 16 (or fewer) random playlists
-            System.out.println("made it into playlistUtil call");
+            System.out.println("WrappedPartOneActivity.java - made it into playlistUtil call");
             List<String> temp = new ArrayList<>(playlists.keySet());
             List<String> playlistNames = new ArrayList<>();
             // if someone has a lot of playlists
@@ -116,11 +115,10 @@ public class WrappedPartOneActivity extends AppCompatActivity {
             } else {
                 playlistNames = temp;
             }
-            /*for (String name: playlistNames) {
-                System.out.print(name);
-            }
-            System.out.println();*/
-            // creating the name list
+
+            // TODO: this part is super inefficient because of how many times we're calling .top5SongsFreq()
+            // getting image URLs for the front card
+            // creating the name list for the back card
             int index = 0;
             int songIndex = 0;
             while (index < imageUrls.length && songIndex < 5) {
@@ -136,22 +134,13 @@ public class WrappedPartOneActivity extends AppCompatActivity {
                 }
                 songIndex++;
             }
-            /*
-            for (String name: playlistNames) {
-                nameList += name + "\n";
-                List<PlaylistSongs.Song> topSongs = Objects.requireNonNull(playlists.get(name)).top5SongsFreq();
-                if (topSongs.size() > 0) {
-                    PlaylistSongs.Song topSong = topSongs.get(0);
-                    imageUrls[urlIndex++] = topSong.getUrlToImage();
-                }
-                if (urlIndex == imageUrls.length) {
-                    break;
-                }
-            }*/
+
+            // load into UI
             List<String> finalPlaylistNames = playlistNames;
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    System.out.println("WrappedPartOneActivity.java runOnUiThread() call");
                     for (int i = 0; i < covers.length; i++) {
                         Picasso.get().load(imageUrls[i]).into(covers[i]);
                     }

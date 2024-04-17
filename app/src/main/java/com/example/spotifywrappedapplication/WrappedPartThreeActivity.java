@@ -92,12 +92,14 @@ public class WrappedPartThreeActivity extends AppCompatActivity {
     protected void populateCards() {
         SpotifyApiHelper helper = new SpotifyApiHelper(mAccessToken);
         helper.getUserTopArtists((responseStr) -> {
+            System.out.println("WrappedPartThreeActivity.java- made it into getUserTopArtists");
             JSONObject response = new JSONObject(responseStr);
             JSONArray artists = response.getJSONArray("items");
             for (int i = 0; i < 5; i++) {
                 JSONObject artist = artists.getJSONObject(i);
                 int finalI = i;
                 helper.getArtistFromID((a) -> {
+                    System.out.println("WrappedPartThreeActivity.java- made it into getArtistFromID");
                     JSONObject fullArtist = new JSONObject(a);
                     JSONArray images = fullArtist.getJSONArray("images");
                     JSONObject icon = images.getJSONObject(0);
@@ -108,7 +110,8 @@ public class WrappedPartThreeActivity extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Picasso.get().load(url).resize(10, 0).into(frontImages[finalI]);
+                            System.out.println("WrappedPartThreeActivity.java - runOnUiThread " + url);
+                            Picasso.get().load(url).resize(30, 0).into(frontImages[finalI]);
                             frontNames[finalI].setText(name);
                             if (name.length() > 12) {
                                 frontNames[finalI].setTextSize(15);
@@ -121,8 +124,7 @@ public class WrappedPartThreeActivity extends AppCompatActivity {
 
 
         helper.getUserTopTracks((responseStr) -> {
-            System.out.println("Got user top tracks.");
-            System.out.println(responseStr);
+            System.out.println("WrappedPartThreeActivity - Got user top tracks.");
             JSONObject response = new JSONObject(responseStr);
             JSONArray tracks = response.getJSONArray("items");
             for (int i = 0; i < 5; i++) {
@@ -136,6 +138,7 @@ public class WrappedPartThreeActivity extends AppCompatActivity {
 
                     @Override
                     public void run() {
+                        System.out.println("WrappedPartThreeActivity.java - runOnUiThread " + url);
                         Picasso.get().load(url).resize(10, 0).into(backImages[finalI]);
                         backNames[finalI].setText(name);
                         if (name.length() > 15) {

@@ -23,7 +23,7 @@
     <string name="sure">Sure!</string>
     <string name="no">No, I\'m Good</string>
     <string name="maybe_later">Maybe Later</string>
-    <string name="part_one_text">Let\'s start with some of your playlists.\nBring back any memories?</string>
+    <string name="part_one_text">Let\'s start with some of your favorite playlists.\nBring back any memories?</string>
     <string name="tap_prompt_text">Tap the image for more info.</string>
     <string name="random_number">30%</string>
 </resources>

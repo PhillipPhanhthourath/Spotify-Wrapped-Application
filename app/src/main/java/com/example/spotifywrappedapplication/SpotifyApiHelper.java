@@ -28,6 +28,74 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
 
+class StringIntPair implements Comparable<StringIntPair> {
+
+    public static List<String> retrieveKeysSorted(Map<String,Integer> wordCountMap){
+
+
+        // Convert it to list of StringIntPair object
+        List<StringIntPair> list = new ArrayList<>();
+        for (Map.Entry<String, Integer> entry : wordCountMap.entrySet()) {
+            list.add(new StringIntPair(entry.getKey(), entry.getValue()));
+        }
+
+        // Sort the list
+        Collections.sort(list);
+
+        List<String> rv = new ArrayList<>();
+
+        // Make the sorted list
+        //System.out.println("Sorted List:");
+        for (StringIntPair pair : list) {
+            //System.out.println(pair.getStr() + " : " + pair.getNum());
+            rv.add(pair.getStr());
+        }
+        return rv;
+    }
+
+    private String str;
+    private int num;
+
+    public StringIntPair(String str, int num) {
+        this.str = str;
+        this.num = num;
+    }
+
+    public String getStr() {
+        return str;
+    }
+
+    public void setStr(String str) {
+        this.str = str;
+    }
+
+    public int getNum() {
+        return num;
+    }
+
+    public void setNum(int num) {
+        this.num = num;
+    }
+
+    @Override
+    public int compareTo(StringIntPair other) {
+        return Integer.compare(this.num, other.num);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StringIntPair that = (StringIntPair) o;
+        return num == that.num && str.equals(that.str);
+    }
+
+    @Override
+    public int hashCode() {
+        return 31 * str.hashCode() + Integer.hashCode(num);
+    }
+}
+
 class PlaylistSongs {
     private static PlaylistSongs topItems;
     private List<Song> songs;
@@ -403,6 +471,7 @@ public class SpotifyApiHelper {
     }
 
     public void getUserTopTracks(StringFunction responseExe, String timeRange) {
+        // TODO: figure out how to only get the top 5 songs, for some reason API call for that doesn't work
         Callback responseCallback = new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -440,6 +509,7 @@ public class SpotifyApiHelper {
     }
 
     public void getUserTopArtists(StringFunction responseExe, String timeRange) {
+        // TODO: figure out how to only get the top 5 songs, for some reason API call for that doesn't work
         Callback responseCallback = new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -524,7 +594,7 @@ public class SpotifyApiHelper {
     }
 
     // All the tracks from all the users playlists
-    // Returns a list of json files, each jsonfile is a playlist
+    // Returns a list of JSONs, each JSON is a playlist
     public void getTracksFromAllPlaylists(StringFunction runExe) {
         Callback finalCallback =new Callback() {
             @Override

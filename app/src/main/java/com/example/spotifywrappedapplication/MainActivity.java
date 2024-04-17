@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         generateSummaryBtn.setOnClickListener((v) -> {
-            // testUtils(new SpotifyApiHelper(mAccessToken));
+            testUtils(new SpotifyApiHelper(mAccessToken));
             onGetUserProfileClicked();
         });
 
@@ -298,8 +298,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void testUtils(SpotifyApiHelper helper){
 
-        System.out.println("Calling test utils method from MainActivity.java");
-        helper.playlistUtil(playlists -> {
+        System.out.println("MainActivity.java - testUtils");
+        /*helper.playlistUtil(playlists -> {
             List<String> playlistnames = new ArrayList<>(playlists.keySet());
             for (String playlist : playlistnames){
                 System.out.println("the name of the playlist:");
@@ -319,7 +319,9 @@ public class MainActivity extends AppCompatActivity {
                 System.out.println(playlists.get(playlist).top5SongsFreq());
             }
 
-        });
+        });*/
+
+        helper.getTracksFromAllPlaylists(System.out::println);
 
 
     }
