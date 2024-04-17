@@ -55,7 +55,7 @@ public class WrappedPartTwoActivity extends AppCompatActivity {
 
         // Set up rest of view on arrival to page
         TextView title = findViewById(R.id.title_text);
-        title.setText("Now for your favorite genres.\nSurprising or no?");
+        title.setText("Now for your favorite genres.\nYou've been listening to a lot of...");
         Button buttonBack = findViewById(R.id.back_button);
         Button buttonNext = findViewById(R.id.continue_button);
         title.startAnimation(WrappedHelper.animation(this, "fade in"));
