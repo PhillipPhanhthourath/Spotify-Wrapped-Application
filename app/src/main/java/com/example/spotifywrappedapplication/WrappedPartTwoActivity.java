@@ -222,7 +222,7 @@ public class WrappedPartTwoActivity extends AppCompatActivity {
      */
     public void returnToPartOne() {
         Intent intent = new Intent(WrappedPartTwoActivity.this, WrappedPartOneActivity.class);
-        intent.putExtra("ACCESS_TOKEN", getIntent().getStringExtra("ACCESS_TOKEN"));
+        intent.putExtra("ACCESS_TOKEN", this.getIntent().getStringExtra("ACCESS_TOKEN"));
         startActivity(intent);
     }
 
@@ -231,7 +231,8 @@ public class WrappedPartTwoActivity extends AppCompatActivity {
      */
     public void continueToPartThree() {
         Intent intent = new Intent(WrappedPartTwoActivity.this, WrappedPartThreeActivity.class);
-        intent.putExtra("ACCESS_TOKEN", getIntent().getStringExtra("ACCESS_TOKEN"));
+        intent.putExtra("ACCESS_TOKEN", this.getIntent().getStringExtra("ACCESS_TOKEN"));
+        intent.putExtra("coverURLs", this.getIntent().getStringExtra("coverURLs"));
         startActivity(intent);
     }
 

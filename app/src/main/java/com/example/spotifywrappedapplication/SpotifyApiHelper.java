@@ -1,6 +1,11 @@
 package com.example.spotifywrappedapplication;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.os.Environment;
 import android.util.Log;
+import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -16,7 +21,10 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -27,6 +35,36 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
+
+
+class ImageExporter {
+
+    public static void exportConstraintLayoutAsImage(Context context, View constraintLayout) {
+        // Measure and layout the view
+        constraintLayout.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        constraintLayout.layout(0, 0, constraintLayout.getMeasuredWidth(), constraintLayout.getMeasuredHeight());
+
+        // Create a bitmap with the same dimensions as the ConstraintLayout
+        Bitmap bitmap = Bitmap.createBitmap(constraintLayout.getWidth(), constraintLayout.getHeight(), Bitmap.Config.ARGB_8888);
+
+        // Draw the ConstraintLayout onto the bitmap's canvas
+        constraintLayout.draw(new android.graphics.Canvas(bitmap));
+
+        // Save the bitmap as an image file
+        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "your_wrapped.png");
+        try {
+            OutputStream outputStream = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+            outputStream.flush();
+            outputStream.close();
+            Toast.makeText(context, "Successfully downloaded!", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(context, "Failed to save image...", Toast.LENGTH_SHORT).show();
+        }
+    }
+}
 
 class StringIntPair implements Comparable<StringIntPair> {
 

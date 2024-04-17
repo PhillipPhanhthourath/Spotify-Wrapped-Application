@@ -77,7 +77,7 @@ public class WrappedPartThreeActivity extends AppCompatActivity {
         });
 
         buttonNext.setOnClickListener((v) -> {
-            continueToGame();
+            continueToEndScreen();
         });
 
         frontCard.setOnClickListener((v) -> {
@@ -141,7 +141,7 @@ public class WrappedPartThreeActivity extends AppCompatActivity {
                         System.out.println("WrappedPartThreeActivity.java - runOnUiThread " + url);
                         Picasso.get().load(url).resize(10, 0).into(backImages[finalI]);
                         backNames[finalI].setText(name);
-                        if (name.length() > 15) {
+                        if (name.length() > 12) {
                             backNames[finalI].setTextSize(15);
                         }
                     }
@@ -155,16 +155,17 @@ public class WrappedPartThreeActivity extends AppCompatActivity {
      */
     protected void returnToPartTwo() {
         Intent intent = new Intent(WrappedPartThreeActivity.this, WrappedPartTwoActivity.class);
-        intent.putExtra("ACCESS_TOKEN", getIntent().getStringExtra("ACCESS_TOKEN"));
+        intent.putExtra("ACCESS_TOKEN", this.getIntent().getStringExtra("ACCESS_TOKEN"));
         startActivity(intent);
     }
 
     /**
      * Continue onwards in the Wrapped Summary
      */
-    protected void continueToGame() {
+    protected void continueToEndScreen() {
         Intent intent = new Intent(WrappedPartThreeActivity.this, WrappedEndScreenActivity.class);
-        intent.putExtra("ACCESS_TOKEN", getIntent().getStringExtra("ACCESS_TOKEN"));
+        intent.putExtra("ACCESS_TOKEN", this.getIntent().getStringExtra("ACCESS_TOKEN"));
+        intent.putExtra("coverURLs", this.getIntent().getStringExtra("coverURLs"));
         startActivity(intent);
     }
 

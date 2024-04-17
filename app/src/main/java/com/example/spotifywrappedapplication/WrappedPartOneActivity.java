@@ -1,45 +1,33 @@
 package com.example.spotifywrappedapplication;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
-import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.Response;
-
 public class WrappedPartOneActivity extends AppCompatActivity {
     private GridLayout frontCard;
     private ImageView[] covers;
+    private String[] imageUrls;
     private TextView backCard;
     private String mAccessToken;
     @Override
@@ -79,7 +67,7 @@ public class WrappedPartOneActivity extends AppCompatActivity {
         });
 
         buttonNext.setOnClickListener((v) -> {
-            continueToGame();
+            continueToPartTwo();
         });
 
         frontCard.setOnClickListener((v) -> {
@@ -94,7 +82,7 @@ public class WrappedPartOneActivity extends AppCompatActivity {
     protected void populateCards() {
         SpotifyApiHelper apiHelper = new SpotifyApiHelper(mAccessToken);
         apiHelper.playlistUtil((playlists) -> {
-            String[] imageUrls = new String[covers.length];
+            imageUrls = new String[covers.length];
             // getting 16 (or fewer) random playlists
             System.out.println("WrappedPartOneActivity.java - made it into playlistUtil call");
             List<String> temp = new ArrayList<>(playlists.keySet());
@@ -165,9 +153,12 @@ public class WrappedPartOneActivity extends AppCompatActivity {
     /**
      * Continue onwards in the Wrapped Summary
      */
-    protected void continueToGame() {
+    protected void continueToPartTwo() {
         Intent intent = new Intent(WrappedPartOneActivity.this, WrappedPartTwoActivity.class);
         intent.putExtra("ACCESS_TOKEN", getIntent().getStringExtra("ACCESS_TOKEN"));
+        System.out.println("continueToPartTwo");
+        System.out.println(Arrays.toString(Arrays.stream(imageUrls).toArray()));
+        intent.putExtra("coverURLs", imageUrls);
         startActivity(intent);
     }
 
