@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
         Button loginBtn = (Button) findViewById(R.id.spotify_login_btn);
         Button generateSummaryBtn = (Button) findViewById(R.id.generate_summary_btn);
         Button codeBtn = (Button) findViewById(R.id.code_btn);
+        Button delBtn = (Button) findViewById(R.id.del_btn);
 
         // Set the click listeners for the buttons
 
@@ -77,6 +78,10 @@ public class MainActivity extends AppCompatActivity {
         generateSummaryBtn.setOnClickListener((v) -> {
             testUtils(new SpotifyApiHelper(mAccessToken));
             onGetUserProfileClicked();
+        });
+
+        delBtn.setOnClickListener((v) -> {
+            onDelClicked();
         });
 
         View rootView = findViewById(android.R.id.content);
@@ -250,6 +255,41 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(MainActivity.this, WrappedWelcomeScreenActivity.class);
         intent.putExtra("ACCESS_TOKEN", mAccessToken);
         startActivity(intent);
+    }
+
+    /*
+        This method should delete the user's account from the firebase
+     */
+    public void onDelClicked() {
+
+        if (mAccessToken == null) {
+            Toast.makeText(this, "You need to Login to Spotify first!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        FirebaseAuth auth = FirebaseUtils.getInstance().getFirebaseAuth();
+        FirebaseUser user = auth.getCurrentUser();
+
+        if (user != null) {
+            // Get a reference to the Firebase Realtime Database
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            DatabaseReference userRef = database.getReference("users").child(user.getUid());
+
+            // Delete the user node
+            userRef.removeValue()
+                    .addOnSuccessListener(aVoid -> {
+                        // Data deletion was successful!
+                        Toast.makeText(MainActivity.this, "User profile deleted successfully.", Toast.LENGTH_SHORT).show();
+                    })
+                    .addOnFailureListener(e -> {
+                        // Failed to delete the data
+                        Log.e("Firebase", "Failed to delete user profile", e);
+                        Toast.makeText(MainActivity.this, "Failed to delete user profile: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    });
+        } else {
+            // Handle the case where there is no authenticated user
+            Toast.makeText(this, "No authenticated user found. Please log in first.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**
