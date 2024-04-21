@@ -254,7 +254,7 @@ public class MainActivity extends AppCompatActivity {
      * Logging a user out of their account
      */
     public void onLogOut() {
-        if (mAccessToken == null) {
+        if (mAccessToken == null || mAuth == null) {
             Toast.makeText(this, "You need to Login to Spotify first!", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -267,7 +267,7 @@ public class MainActivity extends AppCompatActivity {
      * Takes the user to their account settings
      */
     private void onAccountClicked() {
-        if (mAccessToken == null) {
+        if (mAccessToken == null || mAuth == null) {
             Toast.makeText(this, "You need to Login to Spotify first!", Toast.LENGTH_SHORT).show();
             return;
         }
