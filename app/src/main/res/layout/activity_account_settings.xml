@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@drawable/background_lightning_bolt"
+    tools:context=".MainActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_vertical">
+
+
+        <TextView
+            android:id="@+id/past_summaries_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="50dp"
+            android:fontFamily="@font/sen_bold"
+            android:text="@string/past_summaries"
+            android:textColor="@color/black"
+            android:textSize="15sp"
+            android:textStyle="italic"
+            android:visibility="invisible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <ImageView
+            android:id="@+id/past_summaries"
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:src="@drawable/ic_game"
+            android:layout_marginTop="50dp"
+            android:layout_marginBottom="50dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:visibility="invisible"
+            app:layout_constraintTop_toBottomOf="@+id/past_summaries_text"/>
+
+        <LinearLayout
+            android:id="@+id/buttons"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="invisible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.497"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/past_summaries"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:layout_editor_absoluteY="473dp">
+
+            <Button
+                android:id="@+id/change_username_btn"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:background="@drawable/rounded_button"
+                android:backgroundTint="#1A8D43"
+                android:fontFamily="@font/sen_bold"
+                android:text="@string/change_username"
+                android:textColor="#FAFAFA"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/change_password_btn"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:background="@drawable/rounded_button"
+                android:backgroundTint="#1A8D43"
+                android:fontFamily="@font/sen_bold"
+                android:text="@string/change_password"
+                android:textColor="#FAFAFA"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/delete_account_btn"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:background="@drawable/rounded_button"
+                android:backgroundTint="#1A8D43"
+                android:fontFamily="@font/sen_bold"
+                android:text="@string/delete_account"
+                android:textColor="#FAFAFA"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/home_button"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_margin="15dp"
+            android:src="@drawable/house"
+            android:visibility="invisible"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+        />
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>

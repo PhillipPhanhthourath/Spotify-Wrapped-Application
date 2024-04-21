@@ -94,14 +94,30 @@
             app:layout_constraintTop_toBottomOf="@id/generate_summary_btn" />
 
         <Button
-            android:id="@+id/del_btn"
+            android:id="@+id/log_out_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Delete Account"
+            android:text="@string/log_out"
+            android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.226"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/past_summaries" />
+            app:layout_constraintTop_toBottomOf="@+id/past_summaries"
+            app:layout_constraintVertical_bias="0.555" />
+
+        <Button
+            android:id="@+id/account_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/your_account"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.743"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/past_summaries"
+            app:layout_constraintVertical_bias="0.555" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>

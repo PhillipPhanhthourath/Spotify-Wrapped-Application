@@ -42,7 +42,7 @@ public class WrappedPartThreeActivity extends AppCompatActivity {
     private TextView[] backNames;
     private String mAccessToken;
 
-    @SuppressLint("CutPasteId")
+    @SuppressLint({"CutPasteId", "SetTextI18n"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,10 +63,15 @@ public class WrappedPartThreeActivity extends AppCompatActivity {
 
         // Set up rest of view on arrival to page
         TextView title = findViewById(R.id.title_text);
+        TextView tapPrompt = findViewById(R.id.tap_prompt);
         title.setText("What you've been waiting for...\nYour top artists and songs!");
+        tapPrompt.setText("Tap for your favorite songs.");
         Button buttonBack = findViewById(R.id.back_button);
         Button buttonNext = findViewById(R.id.continue_button);
         title.startAnimation(WrappedHelper.animation(this, "fade in"));
+        Animation fadeInSlow = WrappedHelper.animation(this, "fade in");
+        tapPrompt.setVisibility(View.VISIBLE);
+        tapPrompt.startAnimation(fadeInSlow);
         buttonNext.startAnimation(WrappedHelper.animation(this, "fade in"));
         buttonBack.startAnimation(WrappedHelper.animation(this, "fade in"));
 
@@ -82,10 +87,12 @@ public class WrappedPartThreeActivity extends AppCompatActivity {
 
         frontCard.setOnClickListener((v) -> {
             WrappedHelper.flipCard(this, frontCard, backCard);
+            tapPrompt.setText("Tap for your favorite artists.");
         });
 
         backCard.setOnClickListener((v) -> {
             WrappedHelper.flipCard(this, frontCard, backCard);
+            tapPrompt.setText("Tap for your favorite songs.");
         });
     }
 
@@ -154,7 +161,7 @@ public class WrappedPartThreeActivity extends AppCompatActivity {
      * Return to the main page
      */
     protected void returnToPartTwo() {
-        Intent intent = new Intent(WrappedPartThreeActivity.this, WrappedPartTwoActivity.class);
+        Intent intent = new Intent(WrappedPartThreeActivity.this, WrappedPartOneActivity.class);
         intent.putExtra("ACCESS_TOKEN", this.getIntent().getStringExtra("ACCESS_TOKEN"));
         startActivity(intent);
     }
