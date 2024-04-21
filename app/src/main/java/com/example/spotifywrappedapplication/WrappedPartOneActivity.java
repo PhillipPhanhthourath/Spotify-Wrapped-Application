@@ -63,7 +63,7 @@ public class WrappedPartOneActivity extends AppCompatActivity {
 
         // Set the click listeners for the buttons & gesture detector
         buttonBack.setOnClickListener((v) -> {
-            returnToPartOne();
+            returnToWelcome();
         });
 
         buttonNext.setOnClickListener((v) -> {
@@ -145,8 +145,9 @@ public class WrappedPartOneActivity extends AppCompatActivity {
     /**
      * Return to the main page
      */
-    protected void returnToPartOne() {
+    protected void returnToWelcome() {
         Intent intent = new Intent(WrappedPartOneActivity.this, MainActivity.class);
+        intent.putExtra("ACCESS_TOKEN", this.getIntent().getStringExtra("ACCESS_TOKEN"));
         startActivity(intent);
     }
 
@@ -154,7 +155,7 @@ public class WrappedPartOneActivity extends AppCompatActivity {
      * Continue onwards in the Wrapped Summary
      */
     protected void continueToPartTwo() {
-        Intent intent = new Intent(WrappedPartOneActivity.this, WrappedPartTwoActivity.class);
+        Intent intent = new Intent(WrappedPartOneActivity.this, WrappedPartThreeActivity.class);
         intent.putExtra("ACCESS_TOKEN", getIntent().getStringExtra("ACCESS_TOKEN"));
         System.out.println("continueToPartTwo");
         System.out.println(Arrays.toString(Arrays.stream(imageUrls).toArray()));

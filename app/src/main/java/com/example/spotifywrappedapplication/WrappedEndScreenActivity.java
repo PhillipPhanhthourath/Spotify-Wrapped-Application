@@ -1,8 +1,14 @@
 package com.example.spotifywrappedapplication;
 
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
 import java.io.File;
 import java.io.OutputStream;
 import java.time.LocalDateTime;
+
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -10,9 +16,11 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +34,12 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.Firebase;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -60,6 +74,7 @@ public class WrappedEndScreenActivity extends AppCompatActivity {
     private View downloadButton;
     private String mAccessToken;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,8 +96,7 @@ public class WrappedEndScreenActivity extends AppCompatActivity {
         artistNames = new TextView[]{findViewById(R.id.text1a), findViewById(R.id.text2a), findViewById(R.id.text3a)};
         songNames = new TextView[]{findViewById(R.id.text1b), findViewById(R.id.text2b), findViewById(R.id.text3b)};
         populateTop5s();
-        genres = new TextView[]{findViewById(R.id.bar1), findViewById(R.id.bar2), findViewById(R.id.bar3), findViewById(R.id.bar4), findViewById(R.id.bar5)};
-        populateBars();
+        // store in Firebase
         TextView title = findViewById(R.id.title_text);
         Button buttonBack = findViewById(R.id.back_button);
         Button buttonContinue = findViewById(R.id.continue_button);
@@ -127,31 +141,47 @@ public class WrappedEndScreenActivity extends AppCompatActivity {
         });
 
         downloadButton.setOnClickListener((v) -> {
-            //downloadImage(frontCard);
+            saveImageToAccount(frontCard);
             ImageExporter.exportConstraintLayoutAsImage(this, frontCard);
         });
     }
 
-    /**
-     * Download the final wrapped summary onto the device
-     */
-    public void downloadImage(ConstraintLayout image) {
+    private void saveImageToAccount(ConstraintLayout image) {
+        FirebaseUser user = FirebaseUtils.getInstance().getFirebaseAuth().getCurrentUser();
         Bitmap bitmap = Bitmap.createBitmap(image.getWidth(), image.getHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        image.draw(canvas);
-        String filename = "summary_image.jpeg";
-        FileOutputStream outputStream;
-        try {
-            outputStream = this.openFileOutput(filename, Context.MODE_PRIVATE);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
-            outputStream.close();
-            Toast.makeText(this, "Successfully downloaded!", Toast.LENGTH_SHORT).show();
-        } catch (Exception e) {
-            e.printStackTrace();
-            Toast.makeText(this, "Failed to download", Toast.LENGTH_SHORT).show();
-        }
-    }
+        // Convert Bitmap to byte array
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] imageData = baos.toByteArray();
 
+        // Upload byte array to Firebase Storage
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+        StorageReference imagesRef = storageRef.child("images/" + user.getUid() + "/" + summaryDate.getText() + ".jpg");
+
+        UploadTask uploadTask = imagesRef.putBytes(imageData);
+
+        uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                // Image uploaded successfully, now get the download URL
+                imagesRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        String imageUrl = uri.toString();
+                        // Store the imageUrl in the Firebase Realtime Database under the user's node
+                        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(user.getUid());
+                        userRef.child("imageUrl").setValue(imageUrl);
+                    }
+                });
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                // Handle failed upload
+                Toast.makeText(WrappedEndScreenActivity.this, "Failed to upload summary to Firebase storage." + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 
     /**
      * Return to the main page
@@ -169,68 +199,6 @@ public class WrappedEndScreenActivity extends AppCompatActivity {
         Intent intent = new Intent(WrappedEndScreenActivity.this, GameNavActivity.class);
         intent.putExtra("ACCESS_TOKEN", getIntent().getStringExtra("ACCESS_TOKEN"));
         startActivity(intent);
-    }
-
-    public void populateBars() {
-        SpotifyApiHelper helper = new SpotifyApiHelper(this.getIntent().getStringExtra("ACCESS_TOKEN"));
-        helper.getUserSavedTracks((responseStr) -> {
-            System.out.println("WrappedPartTwoActivity.java - made it into getUserSavedTracks");
-            JSONObject response = new JSONObject(responseStr);
-            JSONArray tracks = response.getJSONArray("items");
-            Map<String, Integer> genreFreqs = new HashMap<>();
-            // List<String> genresList = new ArrayList<>();
-            StringBuilder genreStr = new StringBuilder();
-            for (int i = 0; i < tracks.length(); i++) {
-                JSONObject track = tracks.getJSONObject(i).getJSONObject("track");
-                JSONArray artists = track.getJSONArray("artists");
-                helper.getArtistFromID((artistResponseStr) -> {
-                    System.out.println("made it into getArtistFromID");
-                    JSONObject artist = new JSONObject(artistResponseStr);
-                    JSONArray genres = artist.getJSONArray("genres");
-                    for (int j = 0; j < genres.length(); j++) {
-                        System.out.print(genres.getString(j));
-                        String genre = genres.getString(j);
-                        genreStr.append(genre).append(" ");
-                        int freq = genreFreqs.getOrDefault(genre, 0);
-                        genreFreqs.put(genre, freq + 1);
-                    }
-                }, artists.getJSONObject(0).getString("id"));
-            }
-            /*for (String genre: genreFreqs.keySet()) {
-                System.out.print(genre + " ");
-            }*/
-            List<String> genresSorted = StringIntPair.retrieveKeysSorted(genreFreqs);
-            // System.out.println("genresSorted " + genresSorted.get(0));
-            runOnUiThread(new Runnable() {
-
-                @Override
-                public void run() {
-                    System.out.println("genreStr: " + genreStr.toString());
-                    Random rand = new Random();
-                    Integer[] colors = new Integer[]{
-                            Color.parseColor("#FF1493"), // Neon Pink
-                            Color.parseColor("#00BFFF"), // Neon Blue
-                            Color.parseColor("#FF00FF"), // Neon Magenta
-                            Color.parseColor("#FFA500"), // Neon Orange
-                            Color.parseColor("#FF6347"), // Neon Tomato
-                            Color.parseColor("#9932CC"), // Neon Purple
-                            Color.parseColor("#FF4500"), // Neon Orange Red
-                            Color.parseColor("#FFD700"), // Neon Gold
-                            Color.parseColor("#7FFF00"), // Neon Chartreuse
-                            Color.parseColor("#FFA07A"), // Light Salmon
-                            Color.parseColor("#FF8C00"),  // Dark Orange
-                            Color.parseColor("#9370DB"), // Medium Purple
-                    };
-                    for (int i = 0; i < genresSorted.size() && i < 5; i++) {
-                        genres[i].setText(genresSorted.get(i));
-                        genres[i].setBackgroundColor(colors[rand.nextInt(colors.length)]);
-                        ViewGroup.LayoutParams layoutParams = genres[i].getLayoutParams();
-                        layoutParams.height = rand.nextInt(800) + 200; // Set height dynamically
-                        genres[i].setLayoutParams(layoutParams);
-                    }
-                }
-            });
-        });
     }
 
 

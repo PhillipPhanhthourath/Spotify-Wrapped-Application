@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
 
     private String mAccessToken;
     private String mAccessCode;
+    private FirebaseAuth mAuth;
     private Call mCall;
 
     @Override
@@ -58,12 +59,20 @@ public class MainActivity extends AppCompatActivity {
         System.out.println(pastSummaries.toString());
         pastSummaries.setVisibility(View.VISIBLE);
         pastSummaries.startAnimation(WrappedHelper.animation(this, "fly in bottom"));
+        // initialize access token if coming from a previous page
+        if (this.getIntent().getStringExtra("ACCESS_TOKEN") != null) {
+            mAccessToken = this.getIntent().getStringExtra("ACCESS_TOKEN");
+        }
 
         // Initialize the buttons
         Button loginBtn = (Button) findViewById(R.id.spotify_login_btn);
         Button generateSummaryBtn = (Button) findViewById(R.id.generate_summary_btn);
-        Button codeBtn = (Button) findViewById(R.id.code_btn);
-        Button delBtn = (Button) findViewById(R.id.del_btn);
+        Button logoutBtn = (Button) findViewById(R.id.log_out_btn);
+        Button accountBtn = (Button) findViewById(R.id.account_btn);
+        logoutBtn.setVisibility(View.VISIBLE);
+        logoutBtn.startAnimation(WrappedHelper.animation(this, "fly in bottom"));
+        accountBtn.setVisibility(View.VISIBLE);
+        accountBtn.startAnimation(WrappedHelper.animation(this, "fly in bottom"));
 
         // Set the click listeners for the buttons
 
@@ -71,22 +80,19 @@ public class MainActivity extends AppCompatActivity {
             handleSignIn();
         });
 
-        codeBtn.setOnClickListener((v) -> {
-            getCode();
-        });
-
         generateSummaryBtn.setOnClickListener((v) -> {
-            testUtils(new SpotifyApiHelper(mAccessToken));
             onGetUserProfileClicked();
         });
 
-        delBtn.setOnClickListener((v) -> {
-            onDelClicked();
+        logoutBtn.setOnClickListener((v) -> {
+            onLogOut();
         });
 
-        View rootView = findViewById(android.R.id.content);
-        rootView.setOnTouchListener(new SlideUpGestureDetector(this));
+        accountBtn.setOnClickListener((v) -> {
+            onAccountClicked();
+        });
     }
+
 
     /**
      * Performs the appropriate actions for log in user, and register user
@@ -100,16 +106,15 @@ public class MainActivity extends AppCompatActivity {
         FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance(this);
         firebaseAnalytics.logEvent("your_custom_event_name", null);
 
-        //showAuthDialog(this);
-        FirebaseAuth auth = FirebaseUtils.getInstance().getFirebaseAuth();
+        mAuth = FirebaseUtils.getInstance().getFirebaseAuth();
         DialogUtils.showSignInDialog(this, new DialogUtils.AuthDialogListener() {
             @Override
-            public void onSignIn(String email, String password, Context context) {
-                auth.signInWithEmailAndPassword(email, password)
+            public void onPositive(String email, String password, Context context) {
+                mAuth.signInWithEmailAndPassword(email, password)
                         .addOnCompleteListener(task -> {
                             if (task.isSuccessful()) {
                                 Toast.makeText(context, "Signed in successfully", Toast.LENGTH_SHORT).show();
-                                FirebaseUser user = auth.getCurrentUser();
+                                FirebaseUser user = mAuth.getCurrentUser();
 
                                 FirebaseUtils.fetchAccessToken(user, new FirebaseUtils.TokenFetchListener() {
                                     @Override
@@ -135,8 +140,8 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onRegister(String email, String password, Context context) {
-                auth.createUserWithEmailAndPassword(email, password)
+            public void onNegative(String email, String password, Context context) {
+                mAuth.createUserWithEmailAndPassword(email, password)
                         .addOnCompleteListener(task -> {
                             if (task.isSuccessful()) {
                                 Toast.makeText(context, "Registered successfully", Toast.LENGTH_SHORT).show();
@@ -182,18 +187,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-    }
-
-    /**
-     * Get code from Spotify
-     * This method will open the Spotify login activity and get the code
-     * What is code?
-     * https://developer.spotify.com/documentation/general/guides/authorization-guide/
-     */
-    @SuppressLint("RestrictedApi")
-    public void getCode() {
-
-        // Registration succeeded, get the user info
     }
 
 
@@ -257,46 +250,28 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    /*
-        This method should delete the user's account from the firebase
+    /**
+     * Logging a user out of their account
      */
-    public void onDelClicked() {
-
+    public void onLogOut() {
         if (mAccessToken == null) {
             Toast.makeText(this, "You need to Login to Spotify first!", Toast.LENGTH_SHORT).show();
             return;
         }
-
-        FirebaseAuth auth = FirebaseUtils.getInstance().getFirebaseAuth();
-        FirebaseUser user = auth.getCurrentUser();
-
-        if (user != null) {
-            // Get a reference to the Firebase Realtime Database
-            FirebaseDatabase database = FirebaseDatabase.getInstance();
-            DatabaseReference userRef = database.getReference("users").child(user.getUid());
-
-            // Delete the user node
-            userRef.removeValue()
-                    .addOnSuccessListener(aVoid -> {
-                        // Data deletion was successful!
-                        Toast.makeText(MainActivity.this, "User profile deleted successfully.", Toast.LENGTH_SHORT).show();
-                    })
-                    .addOnFailureListener(e -> {
-                        // Failed to delete the data
-                        Log.e("Firebase", "Failed to delete user profile", e);
-                        Toast.makeText(MainActivity.this, "Failed to delete user profile: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                    });
-        } else {
-            // Handle the case where there is no authenticated user
-            Toast.makeText(this, "No authenticated user found. Please log in first.", Toast.LENGTH_SHORT).show();
-        }
+        mAuth.signOut();
+        mAccessToken = null;
+        Toast.makeText(MainActivity.this, "Logged out successfully", Toast.LENGTH_SHORT).show();
     }
 
     /**
-     *
+     * Takes the user to their account settings
      */
-    public void onSlideUp() {
-        Intent intent = new Intent(MainActivity.this, PastSummariesActivity.class);
+    private void onAccountClicked() {
+        if (mAccessToken == null) {
+            Toast.makeText(this, "You need to Login to Spotify first!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Intent intent = new Intent(MainActivity.this, AccountSettingsActivity.class);
         intent.putExtra("ACCESS_TOKEN", mAccessToken);
         startActivity(intent);
     }
@@ -363,45 +338,6 @@ public class MainActivity extends AppCompatActivity {
 
         helper.getTracksFromAllPlaylists(System.out::println);
 
-
-    }
-
-    public class SlideUpGestureDetector implements View.OnTouchListener {
-        private GestureDetector gestureDetector;
-        private Context context;
-
-        public SlideUpGestureDetector(Context context) {
-            this.context = context;
-            gestureDetector = new GestureDetector(context, new GestureListener());
-        }
-
-        @Override
-        public boolean onTouch(View v, MotionEvent event) {
-            return gestureDetector.onTouchEvent(event);
-        }
-
-        private class GestureListener extends GestureDetector.SimpleOnGestureListener {
-            private static final int SWIPE_THRESHOLD = 100;
-            private static final int SWIPE_VELOCITY_THRESHOLD = 100;
-
-            @Override
-            public boolean onDown(MotionEvent e) {
-                return true;
-            }
-
-            @Override
-            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-                float diffY = e2.getY() - e1.getY();
-                if (Math.abs(diffY) > SWIPE_THRESHOLD && Math.abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
-                    if (diffY > 0) {
-                        // Slide-up detected
-                        onSlideUp();
-                        return true; // Consume the event
-                    }
-                }
-                return false;
-            }
-        }
 
     }
 }

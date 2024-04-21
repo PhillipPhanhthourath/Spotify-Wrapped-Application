@@ -1,5 +1,6 @@
 package com.example.spotifywrappedapplication;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -36,6 +37,7 @@ public class WrappedPartTwoActivity extends AppCompatActivity {
     private TextView[] genres;
     private TextView[] percents;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         mAccessToken = this.getIntent().getStringExtra("ACCESS_TOKEN");
@@ -55,11 +57,15 @@ public class WrappedPartTwoActivity extends AppCompatActivity {
 
         // Set up rest of view on arrival to page
         TextView title = findViewById(R.id.title_text);
-        title.setText("Now for your favorite genres.\nYou've been listening to a lot of...");
+        TextView tapPrompt = findViewById(R.id.tap_prompt);
+        title.setText("Now for your favorite genres.\nYou've been listening to...");
+        tapPrompt.setText("Tap for a view of your top 5 recent genres.");
         Button buttonBack = findViewById(R.id.back_button);
         Button buttonNext = findViewById(R.id.continue_button);
         title.startAnimation(WrappedHelper.animation(this, "fade in"));
         Animation fadeInSlow = WrappedHelper.animation(this, "fade in");
+        tapPrompt.setVisibility(View.VISIBLE);
+        tapPrompt.startAnimation(fadeInSlow);
         buttonNext.startAnimation(WrappedHelper.animation(this, "fade in"));
         buttonBack.startAnimation(WrappedHelper.animation(this, "fade in"));
 

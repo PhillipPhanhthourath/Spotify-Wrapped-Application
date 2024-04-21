@@ -13,7 +13,7 @@
         android:background="@drawable/rounded_button"
         android:fontFamily="@font/sen_bold"
         android:padding="5dp"
-        android:text="Log out"
+        android:text="@string/no"
         android:textColor="#FAFAFA"
         android:textSize="10sp"
         android:textStyle="bold"
@@ -60,7 +60,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/summary_image"
         android:layout_width="300dp"
-        android:layout_height="500dp"
+        android:layout_height="300dp"
         android:background="@drawable/summary_background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -107,12 +107,12 @@
             android:gravity="start"
             android:orientation="vertical"
             android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/grid_images"
             app:layout_constraintEnd_toStartOf="@id/top_5_card_b"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.186">
+            app:layout_constraintTop_toBottomOf="@+id/summary_date"
+            app:layout_constraintVertical_bias="1.0">
 
             <LinearLayout
                 android:id="@+id/line1a"
@@ -212,12 +212,12 @@
             android:gravity="start"
             android:orientation="vertical"
             android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/grid_images"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@id/top_5_card_a"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.186">
+            app:layout_constraintTop_toBottomOf="@id/summary_date"
+            app:layout_constraintVertical_bias="1.0">
 
             <LinearLayout
                 android:id="@+id/line1b"
@@ -318,7 +318,7 @@
             android:columnCount="8"
             android:rowCount="2"
             android:visibility="visible"
-            app:layout_constraintBottom_toTopOf="@+id/bar_graph"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
@@ -523,7 +523,7 @@
             android:layout_height="200dp"
             android:gravity="bottom"
             android:orientation="horizontal"
-            android:visibility="visible"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
@@ -581,7 +581,8 @@
                 android:id="@+id/bar4"
                 android:layout_width="0dp"
                 android:layout_height="100dp"
-                android:gravity="center|top"                android:layout_marginEnd="30dp"
+                android:gravity="center|top"
+                android:layout_marginEnd="30dp"
                 android:layout_weight="1"
                 android:fontFamily="@font/sen_bold"
                 android:text="@string/random_text"
@@ -612,7 +613,7 @@
         android:id="@+id/download_background"
         android:visibility="invisible"
         android:layout_width="300dp"
-        android:layout_height="500dp"
+        android:layout_height="300dp"
         android:background="#F69CC6"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -639,19 +640,20 @@
         android:id="@+id/game_prompt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
         android:fontFamily="@font/sen_bold"
         android:gravity="center"
         android:letterSpacing="-0.1"
         android:lineSpacingMultiplier="0.75"
         android:text="@string/game_prompt"
         android:textColor="@color/black"
-        android:textSize="40sp"
+        android:textSize="80sp"
         android:textStyle="bold"
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/summary_image"
-        app:layout_constraintVertical_bias="0.5"/>
+        app:layout_constraintTop_toBottomOf="@id/summary_image" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

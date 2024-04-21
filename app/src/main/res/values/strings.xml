@@ -17,8 +17,8 @@
     <string name="random_text">Random Text</string>
     <string name="next">Next</string>
     <string name="save_credentials">Save Credentials</string>
-    <string name="already_user">Already a user? Slide up to view your past summaries.</string>
-    <string name="end_screen_text">Hope you enjoyed!\nTap on the image to download your full summary.</string>
+    <string name="already_user">Already a user? Click here for your account details.</string>
+    <string name="end_screen_text">Hope you enjoyed!\nTap on the image to save your summary.</string>
     <string name="game_prompt">Want to play a game?</string>
     <string name="sure">Sure!</string>
     <string name="no">No, I\'m Good</string>
@@ -26,4 +26,11 @@
     <string name="part_one_text">Let\'s start with some of your favorite playlists.\nBring back any memories?</string>
     <string name="tap_prompt_text">Tap the image for more info.</string>
     <string name="random_number">30%</string>
+    <string name="log_out">Log Out</string>
+    <string name="your_account">Your Account</string>
+    <string name="back_to_wrapped">Back to Wrapped</string>
+    <string name="change_username">Change Username</string>
+    <string name="change_password">Change Password</string>
+    <string name="delete_account">Delete Account</string>
+    <string name="past_summaries">Tap to view your past summaries.</string>
 </resources>

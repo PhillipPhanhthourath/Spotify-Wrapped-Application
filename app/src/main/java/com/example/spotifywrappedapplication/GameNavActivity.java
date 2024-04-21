@@ -130,7 +130,6 @@ public class GameNavActivity extends AppCompatActivity implements PlaceholderAda
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Implement your navigation logic here
                 // This might involve finishing the current activity or navigating with a NavController
                 finish();  // For example, if this button is meant to close the current activity
             }

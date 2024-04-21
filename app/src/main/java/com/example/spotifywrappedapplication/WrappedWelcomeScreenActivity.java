@@ -50,6 +50,7 @@ public class WrappedWelcomeScreenActivity extends AppCompatActivity {
      */
     public void returnToMain() {
         Intent intent = new Intent(WrappedWelcomeScreenActivity.this, MainActivity.class);
+        intent.putExtra("ACCESS_TOKEN", this.getIntent().getStringExtra("ACCESS_TOKEN"));
         startActivity(intent);
     }
 

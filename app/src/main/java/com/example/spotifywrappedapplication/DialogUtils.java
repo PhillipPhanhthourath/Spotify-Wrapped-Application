@@ -38,10 +38,10 @@ public class DialogUtils {
         builder.setTitle("Sign In / Register");
         builder.setView(layout);
         builder.setPositiveButton("Sign In", (dialog, which) -> {
-            listener.onSignIn(emailInput.getText().toString(), passwordInput.getText().toString(), context);
+            listener.onPositive(emailInput.getText().toString(), passwordInput.getText().toString(), context);
         });
         builder.setNegativeButton("Register", (dialog, which) -> {
-            listener.onRegister(emailInput.getText().toString(), passwordInput.getText().toString(), context);
+            listener.onNegative(emailInput.getText().toString(), passwordInput.getText().toString(), context);
         });
         AlertDialog dialog = builder.show(); // Display the dialog first
         Button positiveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
@@ -51,10 +51,59 @@ public class DialogUtils {
 
     }
 
+    public static void showChangeUserDialog(Context context, AuthDialogListener listener) {
+        LinearLayout layout = new LinearLayout(context);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setBackground(ContextCompat.getDrawable(context, R.drawable.rounded_corners)); // Set rounded corners background
+        layout.setPadding(40, 40, 40, 40); // Add padding inside the layout
+
+        EditText emailInput = new EditText(context);
+        emailInput.setHint("Email");
+        emailInput.setTextColor(Color.parseColor("#6b4dac")); // Purple text color
+        emailInput.setHintTextColor(Color.parseColor("#6b4dac")); // Lighter purple hint text
+        emailInput.setTypeface(Typeface.SANS_SERIF); // Set sans-serif font
+        layout.addView(emailInput);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.CustomDialogTheme); // Custom style for dialog
+        builder.setTitle("Change Username");
+        builder.setView(layout);
+        builder.setPositiveButton("Confirm", (dialog, which) -> {
+            listener.onPositive(emailInput.getText().toString(), null, context);
+        });
+        AlertDialog dialog = builder.show(); // Display the dialog first
+        Button positiveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+        positiveButton.setTextColor(Color.BLUE);
+    }
+
+    public static void showChangePasswordDialog(Context context, AuthDialogListener listener) {
+        LinearLayout layout = new LinearLayout(context);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setBackground(ContextCompat.getDrawable(context, R.drawable.rounded_corners)); // Set rounded corners background
+        layout.setPadding(40, 40, 40, 40); // Add padding inside the layout
+
+        EditText passwordInput = new EditText(context);
+        passwordInput.setHint("Password");
+        passwordInput.setTextColor(Color.parseColor("#6b4dac")); // Purple text color
+        passwordInput.setHintTextColor(Color.parseColor("#6b4dac")); // Lighter purple hint text
+        passwordInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD); // Mask password
+        passwordInput.setTypeface(Typeface.SANS_SERIF); // Set sans-serif font
+        layout.addView(passwordInput);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.CustomDialogTheme); // Custom style for dialog
+        builder.setTitle("Change Password");
+        builder.setView(layout);
+        builder.setPositiveButton("Confirm", (dialog, which) -> {
+            listener.onPositive(null, passwordInput.getText().toString(), context);
+        });
+        AlertDialog dialog = builder.show(); // Display the dialog first
+        Button positiveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+        positiveButton.setTextColor(Color.BLUE);
+    }
+
 
 
     public interface AuthDialogListener {
-        void onSignIn(String email, String password, Context context );
-        void onRegister(String email, String password, Context context);
+        void onPositive(String email, String password, Context context);
+        void onNegative(String email, String password, Context context);
     }
 }
